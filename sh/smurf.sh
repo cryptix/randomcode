@@ -109,6 +109,10 @@ case "$pid" in
 		uri="http://wikipedia.org/wiki/$arg"
 		save=1
 		;;
+	"wa") # wolfram alpha
+		uri="http://wolframalpha.com/input/?i=$arg"
+		save=1
+		;;
 	"u") # utoronto
 		uri="http://search2.library.utoronto.ca/UTL/index?N=0&Ntk=Anywhere&Ntt=$arg&Ntx=mode%2Bmatchallpartial&Nu=p_work_normalized&Np=1&formName=search_form_simple"
 		save=1

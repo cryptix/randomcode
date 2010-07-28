@@ -73,7 +73,7 @@ s_set_write_proper_uri() { # uri
 
 case "$pid" in
 "_SURF_INFO")
-	xprop -id $xid | sed 's/\t/    /g' | $dmenu -fn "$font" -b -l 20
+	xprop -id $xid | sed 's/\t/    /g' | $dmenu -fn "$font" -b -l 15 | xsel -i
 	;;
 "_SURF_FIND")
 	find="`tac $ffile 2>/dev/null | $dmenu -fn "$font" -b -p find:`"

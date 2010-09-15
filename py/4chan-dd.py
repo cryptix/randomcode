@@ -33,7 +33,7 @@ def dumpPics(url):
 		soup = BeautifulSoup(html)
 		
 		# set() to filter out doubles
-		links = set([ l['href'] for l in soup('a', href=re.compile('http://images.4chan.org/d/src/'))]) # TODO: get correct board from url
+		links = set([ a['href'] for a in soup('a', href=re.compile('http://images.4chan.org/'+ url.split('/')[3] + '/src/'))])
 		
 		threads = []
 		for link in links: 

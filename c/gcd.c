@@ -3,12 +3,10 @@
 
 int gcd(int a, int b);
 
-int main (int argc, char const *argv[])
-{
+int main (int argc, char const *argv[]) {
 	int a, b, r=0;
 	
-	if(argc != 3)
-	{
+	if(argc != 3) {
 		printf("Usage: %s a b\n", argv[0]);
 		exit(1);
 	}
@@ -23,10 +21,7 @@ int main (int argc, char const *argv[])
 	return 0;
 }
 
-int gcd(int a, int b)
-{
-	if(b == 0)
-		return a;
-	else
-		gcd(b, a%b);
+int gcd(int a, int b) {
+	return (b == 0) ? a : gcd(b, a%b);
 }
+

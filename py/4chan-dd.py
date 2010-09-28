@@ -43,9 +43,6 @@ def dumpPics(url):
 		
 		for thread in threads: thread.join() # wait for thread to exit
 		
-		
-		return links
-		
 	except Exception, e:
 		raise e
 	else:
@@ -59,4 +56,4 @@ if __name__ == '__main__':
 		print("usage: %s url" % sys.argv[0])
 		sys.exit(1)
 	
-	my = dumpPics(sys.argv[1])
+	dumpPics(sys.argv[1])

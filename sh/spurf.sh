@@ -9,9 +9,6 @@ p=$2
 uri=`sprop $xid _SURF_URI`
 kw=`sprop $xid _SURF_FIND`
 
-
-echo "xid:$xid"
-
 s_sprop() {
 	[ -n "$2" ] && sprop $xid $1 "$2"
 }

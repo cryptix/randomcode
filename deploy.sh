@@ -5,7 +5,4 @@ rmNln() {
 	ln -s ~/code/$loc/$fname ~/bin/$fname
 }
 
-rmNln sh/status.sh
-rmNln sh/spurf.sh
-rmNln sh/sdl.sh
 rmNln py/4chan-dd.py

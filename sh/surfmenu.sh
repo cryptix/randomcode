@@ -3,7 +3,6 @@
 # See README for usage.
 
 bmarks=~/.surf/bmarks
-dmenu="dmenu -nb #181818 -nf #e9e9e9 -sb #181818 -sf #dd6003 -fn -*-terminus-medium-r-normal-*-14-*-*-*-*-*-*-*"
 xid=$1
 p=$2
 uri=`sprop $xid _SURF_URI`
@@ -15,22 +14,26 @@ s_sprop() {
 
 case "$p" in
 "_SURF_FIND")
-	ret="`echo $kw | $dmenu -p find:`"
+	ret="`echo $kw | dmenu -p find:`"
 	s_sprop _SURF_FIND "$ret"
 	;;
 "_SURF_BMARK")
 	grep "$uri" $bmarks >/dev/null 2>&1 || echo "$uri" >> $bmarks
 	;;
 "_SURF_URI_RAW")
-	ret=`echo $uri | $dmenu -p "uri:"`
+	ret=`echo $uri | dmenu -p "uri:"`
 	s_sprop _SURF_GO "$ret"
+	echo $ret | xsel -i
 	;;
 "_SURF_URI")
-	sel=`cat $bmarks | $dmenu -p "uri [gtw*]:"`
+	sel=`cat $bmarks | dmenu -l 5 -p "uri [dgtw*]:"`
 	[ -z "$sel" ] && exit
 	opt=`echo $sel | cut -d ' ' -f 1`
 	arg=`echo $sel | cut -d ' ' -f 2-`
 	case "$opt" in
+	"ende")
+		ret="http://dict.leo.org/ende?search=$arg"
+		;;
 	"g")
 		ret="http://www.google.com/search?q=$arg"
 		;;
@@ -39,6 +42,9 @@ case "$p" in
 		;;
 	"w")
 		ret="http://wikipedia.org/wiki/$arg"
+		;;
+	"wa")
+		ret="http://www.wolframalpha.com/input/?i=$arg"
 		;;
 	*)
 		ret="$sel"

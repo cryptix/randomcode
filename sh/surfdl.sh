@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
 destdir="/tmp/"
 cfile="~/.surf/cookies.txt"
@@ -26,4 +26,4 @@ case "$host" in
 	;;
 esac
 
-xterm -e "cd $destdir && $cmd $args '$url' || read"
+cd $destdir && st -e "$cmd $args '$url' && read"

@@ -21,12 +21,15 @@ case "$p" in
 	grep "$uri" $bmarks >/dev/null 2>&1 || echo "$uri" >> $bmarks
 	;;
 "_SURF_URI_RAW")
-	ret=`echo $uri | dmenu -p "uri:"`
+	ret=`echo $uri | dmenu -p "uri raw:"`
 	s_sprop _SURF_GO "$ret"
 	echo $ret | xsel -i
 	;;
+"_SURF_INFO")
+	xprop -id $xid | sed 's/\t/    /g' | dmenu -l 10 -p "info:"
+	;;
 "_SURF_URI")
-	sel=`cat $bmarks | dmenu -l 5 -p "uri [dgtw*]:"`
+	sel=`cat $bmarks | dmenu -l 5 -p "uri:"`
 	[ -z "$sel" ] && exit
 	opt=`echo $sel | cut -d ' ' -f 1`
 	arg=`echo $sel | cut -d ' ' -f 2-`

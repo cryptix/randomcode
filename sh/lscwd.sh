@@ -3,5 +3,5 @@
 
 for pid in `pidof zsh`
 do
-	stat /proc/$pid/cwd | awk -F'>' '/File/{print $2}' | tr -d \` | tr -d \'
+	stat /proc/$pid/cwd 2>/dev/null| awk -F'`' '/File/{print $3}' | tr -d \'
 done | sort -u

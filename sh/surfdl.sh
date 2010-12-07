@@ -1,7 +1,7 @@
 #!/bin/sh
 
 destdir="/tmp/"
-cfile="~/.surf/cookies.txt"
+cfile="$HOME/.surf/cookies.txt"
 
 cmd="wget"
 
@@ -26,4 +26,4 @@ case "$host" in
 	;;
 esac
 
-cd $destdir && st -e "$cmd $args '$url' && read"
+cd $destdir && st -e $cmd $args "$url" && read

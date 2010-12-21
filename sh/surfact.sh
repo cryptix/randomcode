@@ -26,7 +26,7 @@ case "$p" in
 	echo $ret | xsel -i
 	;;
 "_SURF_INFO")
-	xprop -id $xid | sed 's/\t/    /g' | dmenu -l 10 -p "info:"
+	xprop -id $xid | sed 's/\t/    /g' | dmenu -l 10 -p "info[$xid]:"
 	;;
 "_SURF_URI")
 	sel=`cat $bmarks | dmenu -l 5 -p "uri:"`

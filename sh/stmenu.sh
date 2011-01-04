@@ -9,6 +9,18 @@ case $choice  in
 	"hist")
 	;;
 
+	"root")
+	st -c root -e su -
+	;;
+
+	"window")
+	dmenu_run
+	;;
+
+	"term")
+	cmd=`dmenu_path | dmenu -p "cmd"` && st -e "$cmd"
+	;;
+
 	*)
 	cd $choice && st
 	;;

@@ -5,4 +5,10 @@ rmNln() {
 	ln -s ~/code/$loc/$fname ~/bin/$fname
 }
 
-rmNln py/4chan-dd.py
+rmNln sh/status.sh
+
+#python
+for f in py/{4chan-dd,randvid,wierdspell}.py
+do
+	rmNln $f
+done

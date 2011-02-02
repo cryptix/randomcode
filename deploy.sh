@@ -6,4 +6,9 @@ rmNln() {
 }
 
 rmNln sh/status.sh
-rmNln py/4chan-dd.py
+
+#python
+for f in py/{4chan-dd,randvid,wierdspell}.py
+do
+	rmNln $f
+done

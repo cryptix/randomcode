@@ -3,14 +3,14 @@
 choice=`awk -F'"' '/"\)/{print $2}' ~/bin/stmenu.sh | dmenu -p "st:"`
 case $choice  in
 	"ssh")
-		host=`awk '/^Host/{print $2}' ~/.ssh/config | dmenu -p "ssh:"` && st -c ssh -e ssh $host
+		host=`awk '/^Host/{print $2}' ~/.ssh/config | dmenu -p "ssh:"` && exec st -c ssh -e ssh $host
 	;;
 
 	"hist")
 	;;
 
 	"root")
-	st -c root -e su -
+	exec st -c root -e su -
 	;;
 
 	"window")
@@ -18,11 +18,11 @@ case $choice  in
 	;;
 
 	"term")
-	cmd=`dmenu_path | dmenu -p "cmd"` && st -e "$cmd"
+	cmd=`dmenu_path | dmenu -p "cmd"` && exec st -e "$cmd"
 	;;
 
 	*)
-	cd $choice && st
+	cd $choice && exec st
 	;;
 esac
 

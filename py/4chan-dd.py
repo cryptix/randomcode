@@ -6,7 +6,7 @@
 
 
 from BeautifulSoup import BeautifulSoup
-from urllib2 import urlopen
+from urllib.request import urlopen
 from os import fstat
 import threading
 import re
@@ -23,7 +23,7 @@ class myDumper(threading.Thread):
 		if pic.getcode() == 200:
 				f = open(self.url.split('/')[-1] ,'w')
 				if fstat(f.fileno()).st_size == 0: f.write(pic.read())
-		print 'fetched: %s - %d' % (pic.geturl(), pic.getcode())
+		print('fetched: {0} - {1}'.format(pic.geturl(), pic.getcode()))
 	
 
 def dumpPics(url):
@@ -43,17 +43,17 @@ def dumpPics(url):
 		
 		for thread in threads: thread.join() # wait for thread to exit
 		
-	except Exception, e:
+	except Exception as e:
 		raise e
 	else:
-		print "all well done"
+		print("all well done")
 
 		
 if __name__ == '__main__':
 	import sys
 	
 	if len(sys.argv) != 2:
-		print("usage: %s url" % sys.argv[0])
+		print("usage: {0} url".format(sys.argv[0]))
 		sys.exit(1)
 	
 	dumpPics(sys.argv[1])

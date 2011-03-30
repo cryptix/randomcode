@@ -1,0 +1,9 @@
+h1 Crawlr
+- if(typeof err != 'undefined')
+	p#error= err
+p Please specify a directory you want to list:
+form(method="post")
+	label(for="dir") Directory
+	input(type="text", name="dir", value=".")
+
+	input(type="submit", value="Send")

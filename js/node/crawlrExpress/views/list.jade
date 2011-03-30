@@ -1,0 +1,18 @@
+h1 Crawlr
+p Currently listing '#{current}'
+	form(method="post")
+		input(type="Submit", value="Change")
+
+h2 Directories
+table
+	thead
+		td Name
+		td Mtime
+	tbody!= partial('dir', dirs)
+	
+h2 Files
+table
+	thead
+		td Name
+		td Size
+	tbody!= partial('file', files)

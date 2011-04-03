@@ -48,25 +48,14 @@ app.get('/', function(req, res) {
 		var dirs = [];
 		var files = [];
 
-		finder.on('directory', function(dir, stat) {
-			var entry = { name: dir,
-				      mode: stat.mode,
-				      atime: stat.atime,
-				      mtime: stat.mtime,
-				      ctime: stat.ctime,
-				      full: stat
-				    };
-			dirs.push(entry);
+		finder.on('directory', function(dir) {
+			dirs.push(dir);
 		});
 
 		finder.on('file', function(file, stat) {
 			var entry = { name: file,
 				      size: stat.size,
-				      mode: stat.mode,
-				      atime: stat.atime,
 				      mtime: stat.mtime,
-				      ctime: stat.ctime,
-				      full: stat
 				    };
 			files.push(entry);
 		});

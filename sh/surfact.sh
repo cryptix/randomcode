@@ -40,14 +40,14 @@ case "$p" in
 	"g")
 		ret="http://www.google.com/search?q=$arg"
 		;;
-	"t")
-		ret="http://tinyurl.com/create.php?url=$uri"
-		;;
 	"w")
 		ret="http://wikipedia.org/wiki/$arg"
 		;;
 	"wa")
 		ret="http://www.wolframalpha.com/input/?i=$arg"
+		;;
+	"iso")
+		ret="http://isohunt.com/torrents/?ihq=$arg"
 		;;
 	*)
 		ret="$sel"

@@ -25,17 +25,19 @@ finder.on('end', function() {
 	console.log("\n\n[crawlr] Done");
 
 	var tmp = tree.getLimb(treeRoot, dir);
-	console.dir(tmp);
+	if(tmp) {
+		console.dir(tmp);
 
 
-	console.log("\n\n" + tmp.leaves.length + " leaves  of " + tmp.name);
-	tmp.leaves.sort();
-	for(var i in tmp.leaves) {
-		console.dir(tmp.leaves[i]);
-	}
+		console.log("\n\n" + tmp.leaves.length + " leaves  of " + tmp.name);
+		tmp.leaves.sort();
+		for(var i in tmp.leaves) {
+			console.dir(tmp.leaves[i]);
+		}
 
-	console.log("\n\n" + tmp.parents.length + " parents  of " + tmp.name);
-	for(var i in tmp.parents) {
-		console.dir(tmp.parents[i]);
+		console.log("\n\n parents  of " + tmp.name);
+		for(var i in tmp.parents) {
+			console.dir(tmp.parents[i]);
+		}
 	}
 });

@@ -3,7 +3,7 @@
  */
 
 var express = require('express'),
-    findit  = require('findit');
+    crawlr  = require('../crawlrCB.js');
 
 
 var app = module.exports = express.createServer();
@@ -44,33 +44,12 @@ app.post('/', function(req, res) {
 
 app.get('/', function(req, res) {
 	if(req.session.dir) {
-		var finder = findit.find(req.session.dir);
-		var dirs = [];
-		var files = [];
-
-		finder.on('directory', function(dir) {
-			dirs.push(dir);
-		});
-
-		finder.on('file', function(file, stat) {
-			var entry = { name: file,
-				      size: stat.size,
-				      mtime: stat.mtime,
-				    };
-			files.push(entry);
-		});
-
-		finder.on('error', function(err) {
-			delete req.session.dir;
-			res.render('index', {err: err});
-		});
-
-		finder.on('end', function() {
+		crawlr.buildTree(req.session.dir, function(tree) {
 			res.render('list', {
 					current: req.session.dir,
-					files: files,
-					dirs: dirs
-				  });	
+					files: tree.leaves,
+					dirs: tree.children
+			});
 		});
 	} else {
 		res.render('index');	
@@ -78,7 +57,6 @@ app.get('/', function(req, res) {
 });
 
 // Only listen on $ node app.js
-
 if (!module.parent) {
   app.listen(3000);
   console.log("Express server listening on port %d", app.address().port);

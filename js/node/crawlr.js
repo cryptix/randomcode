@@ -10,21 +10,17 @@ var finder = require('findit').find(dir);
 var treeRoot = new tree.limb('root');
 
 finder.on('directory', function(dir, stat) {
-	//console.log("\n\n[crawlr] Dir:" + dir);
-	//console.dir(stat);
-	tree.addDirTo(treeRoot, dir);
+	treeRoot.addChild(dir);
 });
 
 finder.on('file', function(file, stat) {
-	//console.log("\n\n[crawlr] File:" + file);
-	//console.dir(stat);
-	tree.addFileTo(treeRoot, file);
+	treeRoot.addLeave(file);
 });
 
 finder.on('end', function() {
 	console.log("\n\n[crawlr] Done");
 
-	var tmp = tree.getLimb(treeRoot, dir);
+	var tmp = treeRoot.getLimb(dir);
 	if(tmp) {
 		console.dir(tmp);
 
@@ -36,8 +32,8 @@ finder.on('end', function() {
 		}
 
 		console.log("\n\n parents  of " + tmp.name);
-		for(var i in tmp.parents) {
-			console.dir(tmp.parents[i]);
+		for(var i in tmp.childs) {
+			console.dir(tmp.childs[i]);
 		}
 	}
 });

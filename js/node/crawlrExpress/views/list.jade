@@ -6,8 +6,14 @@ div#head
 div#wrap
 	div#tree
 		h2 Tree
-		ul!= partial('dir', dirs)
+		ul
+			li
+				a(href="..") ..
+			- each val, key in dirs
+				li
+					a(href: val.name) #{val.name}
 		
+
 	div#files
 		h2 Files
 		table

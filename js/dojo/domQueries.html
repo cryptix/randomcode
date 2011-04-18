@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Demo: DOM Queries</title>
+		<style type="text/css" media="screen">
+			.red {
+				color: #F00;
+			}
+			.blue {
+				color: #00F;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			dojo.ready(function() {
+				// select nodes by id
+				var list = dojo.query("#list")[0];
+				
+				// select nodes by class name
+				var odds = dojo.query(".odd");
+				
+				// retrieve an array of nodes with the class name "odd"
+				// from the first list using a selector
+				var odds1 = dojo.query("#list .odd");
+
+				// retrieve an array of nodes with the class name "odd"
+				// from the first list using a DOM node
+				var odds2 = dojo.query(".odd", dojo.byId("list"));
+				
+				// Only get a tags with the odd class
+				var oddA = dojo.query("a.odd");
+				
+				// Retrieve an array of any a element that has an
+				// li as its ancestor.
+				var allA = dojo.query("li a");
+				// Retrieve an array of any a element that has an
+				// li as its direct ancestor.
+				var someA = dojo.query("li > a");
+				
+				//NodeList
+				dojo.query(".odd").forEach(function(node, index, nodelist){
+				    // for each node in the array returned by dojo.query,
+				    // execute the following code
+				    dojo.addClass(node, "red");
+				});
+				
+				// Add "red" to the className of each node matching
+				// the selector ".odd"
+				dojo.query(".odd").addClass("red");
+				// Add "blue" to the className of each node matching
+				// the selector ".even"
+				dojo.query(".even").addClass("blue");
+				
+				// Remove "red" from and add "blue" to the className
+				// of each node matching the selector ".odd"
+				dojo.query(".odd").removeClass("red").addClass("blue");
+				
+				// Change the font color to "white" and add "italic" to
+				// the className of each node matching the selector ".even"
+				dojo.query(".even").style("color", "white").addClass("italic");
+			});
+		</script>
+	</head>
+	<body>
+		<h1>Demo: DOM Queries</h1>
+		
+		<h2>Queries</h2>
+		<ul id="list">
+		    <li class="odd">
+		        <div class="bold">
+		            <a class="odd">Odd</a>
+		        </div>
+		    </li>
+		    <li class="even">
+		        <div class="italic">
+		            <a class="even">Even</a>
+		        </div>
+		    </li>
+		    <li class="odd">
+		        <a class="odd">Odd</a>
+		    </li>
+		    <li class="even">
+		        <div class="bold">
+		            <a class="even">Even</a>
+		        </div>
+		    </li>
+		    <li class="odd">
+		        <div class="italic">
+		            <a class="odd">Odd</a>
+		        </div>
+		    </li>
+		    <li class="even">
+		        <a class="even">Even</a>
+		    </li>
+		</ul>
+
+		<ul id="list2">
+		    <li class="odd">Odd<li>
+		</ul>
+		<h2>NodeList</h2>
+		<div id="list">
+		    <div class="odd">One</div>
+		    <div class="even">Two</div>
+		    <div class="odd">Three</div>
+		    <div class="even">Four</div>
+		    <div class="odd">Five</div>
+		    <div class="even">Six</div>
+		</div>
+	</body>
+</html>

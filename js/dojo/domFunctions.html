@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Demo: DOM Functions</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			// Retrieval
+			function setText (node, text) {
+				node = dojo.byId(node);
+				
+				node.innerHTML = text;
+			}
+		
+			dojo.ready(function() {
+				var one = dojo.byId("one");
+				
+				// setText takes DOM nodes and strings,
+				setText(one, "One has been set.");
+				setText("two", "Two has ben set as well.")
+				
+				// Creation
+				var list = dojo.byId("list"),
+					three = dojo.byId("three");
+					
+				dojo.create("li", {
+					innerHTML: "Six"
+				}, list);
+				
+				dojo.create("li", {
+					innerHTML: "Seven",
+					className: "seven",
+					style: {
+						fontWeight: "bold"
+					}
+				}, list);
+				
+				dojo.create("li", {
+					innerHTML: "Three and a half"
+				}, three, "after");
+			});
+			
+			// Placement
+			function moveFirst(){
+			    var list = dojo.byId("list"),
+			        three = dojo.byId("three");
+
+			    dojo.place(three, list, "first");
+			}
+
+			function moveBeforeTwo(){
+			    var two = dojo.byId("two"),
+			        three = dojo.byId("three");
+
+			    dojo.place(three, two, "before");
+			}
+
+			function moveAfterFour(){
+			    var four = dojo.byId("four"),
+			        three = dojo.byId("three");
+
+			    dojo.place(three, four, "after");
+			}
+
+			function moveLast(){
+			    var list = dojo.byId("list"),
+			        three = dojo.byId("three");
+
+			    dojo.place(three, list);
+			}
+			// Destruction
+			function destroyFirst(){
+			    var list = dojo.byId("list"),
+			        items = list.getElementsByTagName("li");
+
+			    if(items.length){
+			        dojo.destroy(items[0]);
+			    }
+			}
+
+			function destroyAll(){
+			    dojo.empty("list");
+			}
+		</script>
+	</head>
+	<body>
+		<h1>Demo: DOM Functions</h1>
+		<ul id="list">
+			<li id="one">One</li>
+			<li id="two">Two</li>
+			<li id="three">Three</li>
+			<li id="four">Four</li>
+			<li id="five">Five</li>
+		</ul>
+		<h2>Placement</h2>
+		<button onclick="moveFirst();">The first item</button>
+		<button onclick="moveBeforeTwo();">Before Two</button>
+		<button onclick="moveAfterFour();">After Four</button>
+		<button onclick="moveLast();">The last item</button>
+		<h2>Destruction</h2>
+		<button onclick="destroyFirst();">Destroy the first list item</button>
+		<button onclick="destroyAll();">Destroy all list items</button>
+	</body>
+</html>

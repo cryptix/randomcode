@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Demo: Dojo Events</title>
+		<style type="text/css" media="screen">
+			.red-block {
+				display: block;
+				color: black;
+				background-color: red;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+	    	// Wait for the DOM to be ready before working with it
+	    	dojo.ready(function(){
+	 			var myButton = dojo.byId("myButton"),
+					myDiv = dojo.byId("myDiv");
+
+				// Connect
+				dojo.connect(myButton, "onclick", function (evt) {
+					dojo.style(myDiv, "backgroundColor", "blue");
+				});
+				
+				dojo.connect(myDiv, "onmouseenter", function (evt) {
+					dojo.style(myDiv, "backgroundColor", "red");
+				});
+				
+				dojo.connect(myDiv, "onmouseleave", function (evt) {
+					dojo.style(myDiv, "backgroundColor", "");
+				});
+				
+
+				// Disconnect
+				var handle = dojo.connect(myButton, "onclick", function(evt){
+				    // Disconnect this event using the handle
+				    dojo.disconnect(handle);
+
+				    // Do other stuff here that you only want to happen one time
+				    alert("This alert will only happen one time.");
+				});
+				
+
+				// Scoped events
+				var myScopedButton1 = dojo.byId("myScopedButton1"),
+				    myScopedButton2 = dojo.byId("myScopedButton2"),
+				    myObject = {
+				        id: "myObject",
+				        onClick: function(evt){
+				            alert("The scope of this handler is " + this.id);
+				        }
+				    };
+
+				// This will alert "myScopedButton1"
+				dojo.connect(myScopedButton1, "onclick", myObject.onClick);
+				// This will alert "myObject" rather than "myScopedButton2"
+				dojo.connect(myScopedButton2, "onclick", myObject, "onClick");
+				
+
+				// NodeList events
+				dojo.query(".clickMe").connect("onclick", myObject.onClick);
+				dojo.query(".clickMeAlso").connect("onclick", myObject, "onClick");
+				
+
+				// Object Methods
+				var myButtonObject = {
+					onClick: function (evt) {
+						alert("The button was clicked");
+					}
+				};
+				dojo.connect(dojo.byId("myButtonObject"), "onclick", myButtonObject, "onClick");
+				
+				// get notified when Object's method gets called
+				dojo.connect(myButtonObject, "onClick", function (evt) {
+					alert("The button was clicked and 'onClick' was called");
+				});
+				
+
+				// argument passing for events
+				var myButtonObject2 = {
+					onClickHandler: function (evt) {
+						this.onClick(evt, "another argument");
+					},
+					onClick: function (){}
+				};
+				dojo.connect(dojo.byId("myButtonObject2"), "onclick", myButtonObject2, "onClickHandler");
+				dojo.connect(myButtonObject2, "onClick", function (evt, arg) {
+					alert("The button was clicked, we were given a second argument:" + arg);
+				});
+				
+
+				// Effects example
+				var fadeButton = dojo.byId("fadeButton"),
+					fadeTarget = dojo.byId("fadeTarget");
+					
+				dojo.connect(fadeButton, "onclick", function (evt) {
+					var anim = dojo.fadeOut({node: fadeTarget});
+					
+					dojo.connect(anim, "onEnd", function () {
+						alert("The fade has finished");
+					});
+					
+					anim.play();
+				});
+				
+
+				// Publish/Subscribe
+				var alertButton = dojo.byId("alertButton"),
+					createAlert = dojo.byId("createAlert");
+				
+				dojo.connect(alertButton, "onclick", function (evt) {
+					// When this button is clicked,
+					// publish to the "alertUser" topic
+					dojo.publish("alertUser", ["I am alerting you!"]);
+				});
+				dojo.connect(createAlert, "onclick", function (evt) {
+					// Create another button
+					var anotherButton = dojo.create("button", {
+						innerHTML: "Another alert button"
+					}, createAlert, "after");
+					
+					// When the other button is clicked,
+					// publish to the "alertUser" topic
+					dojo.connect(anotherButton, "onclick", function (evt) {
+						dojo.publish("alertUser", ["I am also alerting you."]);
+					})
+				})
+				
+				// Register the alerting routine with the "alertUser" topic
+				dojo.subscribe("alertUser", function(text) {
+					alert(text);
+				});
+	    	});
+		</script>
+	</head>
+	<body>
+		<h1>Demo: Dojo Events</h1>
+		<button id="myButton">Click Me!</button>
+		<div id="myDiv">Hover over me!</div>
+		<button id="myScopedButton1">Scope One</button>
+		<button id="myScopedButton2">Scope Two</button>
+
+		<h2>NodeList Events</h2>
+		<button id="button1" class="clickMe">Click me</button>
+		<button id="button2" class="clickMeAlso">Click me also</button>
+		<button id="button3" class="clickMe">Click me too</button>
+		<button id="button4" class="clickMeAlso">Please click me</button>
+		
+		<h2>Object Methods</h2>
+		<button id="myButtonObject">My Object-button</button>
+		<button id="myButtonObject2">My other Object-button</button>
+
+		<h2>Effects Example</h2>
+		<button id="fadeButton">Fade block out</button>
+		<div id="fadeTarget" class="red-block">Some content</div>
+
+		<h2>Publish/Subscribe</h2>
+		<button id="alertButton">Alert the user</button>
+		<button id="createAlert">Create another alert button</button>
+	</body>
+</html>

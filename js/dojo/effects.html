@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Demo: Dojo Effects</title>
+		<style type="text/css" media="screen">
+			.effect {
+				float:left;
+				border: 1px solid #999;
+				padding: 0.5em;
+			}
+			.red-block {
+				width: 100px;
+			    height: 100px;
+			    background-color: red;
+			    margin:2em;
+			    padding:0.5em;
+			    text-align:center;
+			}
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			dojo.require("dojo.fx");
+			
+	    	// Wait for the DOM to be ready before working with it
+	    	dojo.ready(function(){
+		
+				// Fading
+	 			var fadeOutButton = dojo.byId("fadeOutButton"),
+					fadeInButton = dojo.byId("fadeInButton"),
+					fadeTarget = dojo.byId("fadeTarget");
+					
+				dojo.connect(fadeOutButton, "onclick", function (evt) {
+					dojo.fadeOut({node: fadeTarget}).play();
+				});
+				dojo.connect(fadeInButton, "onclick", function (evt) {
+					dojo.fadeIn({node: fadeTarget}).play();
+				});
+				
+				
+				// Wiping
+				var wipeOutButton = dojo.byId("wipeOutButton"),
+					wipeInButton = dojo.byId("wipeInButton"),
+					wipeTarget = dojo.byId("wipeTarget");
+				
+				dojo.connect(wipeOutButton, "onclick", function (evt) {
+					dojo.fx.wipeOut({node: wipeTarget}).play();
+				});
+				dojo.connect(wipeInButton, "onclick", function (evt) {
+					dojo.fx.wipeIn({node: wipeTarget}).play();
+				});
+				
+				
+				// Sliding and Animation Events
+				var slideAwayButton = dojo.byId("slideAwayButton"),
+					slideBackButton = dojo.byId("slideBackButton"),
+					slideTarget  = dojo.byId("slideTarget");
+				
+				dojo.connect(slideAwayButton, "onclick", function (evt) {
+					var anim = dojo.fx.slideTo({
+						node: slideTarget,
+						left:"450",
+						top:"50",
+						beforebegin: function() {
+							dojo.style(slideTarget, {
+								left: "0px",
+								top: "300px"
+							});
+						}
+					});
+					
+					dojo.connect(anim, "onEnd", function () {
+						dojo.style(slideTarget, {
+							backgroundColor: "blue"
+						});
+					});
+					
+					anim.play();
+				});
+				dojo.connect(slideBackButton, "onclick", function (evt) {
+					var anim = dojo.fx.slideTo({
+						node: slideTarget,
+						left:"0",
+						top:"100",
+						beforebegin: function() {
+							dojo.style(slideTarget, {
+								left: "200px",
+								top: "200px"
+							});
+						}
+					});
+					
+					dojo.connect(anim, "onEnd", function () {
+						dojo.style(slideTarget, {
+							backgroundColor: "red"
+						});
+					});
+					
+					anim.play();
+				});
+				
+				
+				// Chaining
+				var chainAwayButton = dojo.byId("chainAwayButton"),
+					chainBackButton = dojo.byId("chainBackButton"),
+					chainTarget = dojo.byId("chainTarget");
+					
+				dojo.connect(chainAwayButton, "onclick", function (evt) {
+					dojo.fx.chain([
+						dojo.fadeIn({node: chainTarget}),
+						dojo.fx.slideTo({node: chainTarget, left:"150", top:"150"}),
+						dojo.fadeOut({node: chainTarget})
+					]).play()
+				});
+				dojo.connect(chainBackButton, "onclick", function (evt) {
+					dojo.fx.chain([
+						dojo.fadeIn({node: chainTarget}),
+						dojo.fx.slideTo({node: chainTarget, left:"1000", top:"100"}),
+						dojo.fadeOut({node: chainTarget})
+					]).play()
+				});
+				
+				
+				// Combine
+				var combineAwayButton = dojo.byId("combineAwayButton"),
+					combineBackButton = dojo.byId("combineBackButton"),
+					combineTarget = dojo.byId("combineTarget");
+				
+				dojo.connect(combineAwayButton, "onclick", function (evt) {
+					dojo.fx.combine([
+						dojo.fadeIn({node: combineTarget}),
+						dojo.fx.slideTo({node: combineTarget, left:"250", top:"10"})
+					]).play();
+				});
+				dojo.connect(combineBackButton, "onclick", function (evt) {
+					dojo.fx.combine([
+						dojo.fx.slideTo({node: combineTarget, left:"0", top:"100"}),
+						dojo.fadeOut({node: combineTarget})
+					]).play();
+				});
+	    	});
+		</script>
+	</head>
+	<body>
+		<h1>Demo: Dojo Effects</h1>
+		
+		<div class="effect">
+			<h2>Fading</h2>
+			<button id="fadeOutButton">Fade block out</button>
+			<button id="fadeInButton">Fade block in</button>
+			<div id="fadeTarget" class="red-block">A red block</div>
+		</div>
+
+		<div class="effect">
+			<h2>Wiping</h2>
+			<button id="wipeOutButton">Wipe block out</button>
+			<button id="wipeInButton">Wipe block in</button>
+			<div id="wipeTarget" class="red-block wipe">A red block</div>
+		</div>
+
+		<div class="effect">
+			<h2>Sliding and Animation Events</h2>
+			<button id="slideAwayButton">Slide block away</button>
+			<button id="slideBackButton">Slide block back</button>
+			<div id="slideTarget" class="red-block slide">A red block</div>
+		</div>
+		
+		<div class="effect">
+			<h2>Chaining</h2>
+			<button id="chainAwayButton">Chain block away</button>
+			<button id="chainBackButton">Chain block back</button>
+			<div id="chainTarget" class="red-block slide chain">A red block</div>
+		</div>
+		
+		<div class="effect">
+			<h2>Combining</h2>
+			<button id="combineAwayButton">Combine block away</button>
+			<button id="combineBackButton">Combine block back</button>
+			<div id="combineTarget" class="red-block slide chain">A red block</div>
+		</div>
+	</body>
+</html>

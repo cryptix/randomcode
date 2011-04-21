@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Demo: Array Helper</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/dojo/1.6/dojo/dojo.xd.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+		// Wait for the DOM to be ready before working with it
+		dojo.ready(function(){
+			/*
+			 * Searching
+			 */
+			var arr1 = [1,2,3,4,3,2,1,2,3,4,3,2,1];
+			dojo.indexOf(arr1, 2);     // returns 1
+			dojo.indexOf(arr1, 2, 2);  // returns 5
+			dojo.lastIndexOf(arr1, 2); // returns 11
+			
+			// uses strict comparison (===)
+			var obj1 = { id: 1},
+				arr2 = [{id: 0}, obj1, {id: 2}, {id: 3}];
+			
+			dojo.indexOf(arr2, obj1);    // returns 1
+			dojo.indexOf(arr2, {id: 1}); // returns -1; looks the same but different object
+			
+			/*
+			 * Looping
+			 */
+			
+			// classic but disadvantagous
+			var item, len = arr1.length;
+			for(var i = 0; i < len; item=arr1[i++]) {
+				// do something with item
+			}
+			
+			// better:
+			var arr3 = ["one", "two", "three", "four"],
+				list1 = dojo.byId("list1");
+			
+			// Skip over index 4, leaving it undefined
+			arr3[5] = "six";
+			
+			dojo.forEach(arr3, function(item, index) {
+					if(index == 3) {
+						// this changes the original array
+						arr3[5] = "seven";
+					}
+			
+					dojo.create("li", {
+						innerHTML: "(" + index + ") " + item 
+					}, list1);
+			});
+			
+			// scope parameter
+			var list2 = dojo.byId("list2");
+			var myObject = {
+				prefix: "ITEM: ",
+				formatItem: function(item, index) {
+					return this.prefix + item + " (" + index + ")";
+				},
+				outputItems: function( arr, node) {
+					dojo.forEach(arr, function(item, index) {
+						dojo.create("li", {
+							innerHTML: this.formatItem(item, index)
+						}, node);
+					}, this);
+				}
+			};
+			
+			myObject.outputItems(arr1, list2);
+			
+			
+			/*
+			 * Manipulating
+			 */
+			// classic
+			var original = ["one", "two", "three", "four", "five"],
+				transformed = [];
+
+			dojo.forEach(original, function(item, index) {
+				transformed.push({
+					id: index * 100,
+					text: item
+				});
+			}); // [ {id: 0, text: "one"}, {id: 100, text: "two"}, ... ]
+
+			// better
+			var mapped = dojo.map(original, function(item, index) {
+				return {
+					id: index * 100,
+					text: item
+				};
+			});
+
+
+			// filter
+			var filtered = dojo.filter(mapped, function(item, index) {
+				return item.id > 50 && item.id < 350;
+			}); // if return == true : item is in filterd
+
+			/*
+			 * Matching
+			 */
+			var array1 = [1,2,3,4,5],
+				array2 = [1,1,1,1,1];
+
+			dojo.every(array1, function(item) { return item == 1; }); // returns false
+			dojo.some(array1, function(item) { return item == 1; });  // returns true
+			
+			dojo.every(array2, function(item) { return item == 1; }); // returns true
+			dojo.some(array2, function(item) { return item == 1; });  // returns true
+
+			dojo.every(array2, function(item) { return item == 2; }); // returns false
+			dojo.some(array2, function(item) { return item == 2; });  // returns false
+		});
+		</script>
+	</head>
+	<body>
+		<h1>Demo: Simple Events</h1>
+		<ul id="list1">
+		</ul>
+		<ul id="list2">
+		</ul>
+	</body>
+</html>

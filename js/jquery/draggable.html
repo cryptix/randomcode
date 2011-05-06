@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+  <style type="text/css">
+#drags { background: #CCC; }
+.hilite { background: #888; }
+
+.draggable { 
+	float: left;
+	height: 200px;
+	width: 200px;
+}
+  </style>
+  <script>
+  var pics = [];
+  function newLi(val) {
+	var li = $('<li></li>');
+	var butn = $('<a></a>');
+
+	li.attr('value', val);
+	li.addClass('draggable');
+	li.hover(function() {
+		$(this).fadeTo("fast", 0.65);
+	}, function() {
+		$(this).fadeTo("slow", 1);
+	});
+
+	butn.text("Kill me");
+	butn.click(function() {
+		val--;
+		$(this).fadeTo("slow", 0);
+		$(this.parentNode).remove();
+	});
+
+	li.append(butn);
+
+
+	$('#drags').append(li);
+
+	$(".draggable").draggable();
+  }
+
+  $(document).ready(function() {
+
+	$("#update").click(function() {
+		var c = $('#count').val(),
+			w = $('#width').val(),
+			h = $('#height').val();
+
+		$('#drags > li').remove();
+		for(var i=0; i < c; i++) {
+			newLi(i);
+		}
+		$('#drags > li').css({
+			'background-image': 'url(http://lorempixum.com/'+w+'/'+h+')',
+			'height': h + 'px',
+			'width' : w + 'px'
+			});
+
+	});
+
+  });
+  </script>
+</head>
+<body style="font-size:62.5%;">
+<div id="settings">
+    <label for="count">Count</label>
+    <input id="count" name="count" size="25" class="required" value="10" minlength="2" />
+    <label for="width">Width</label>
+    <input id="width" name="width" size="25" class="required" value="200" minlength="2" />
+    <label for="height">Height</label>
+    <input id="height" name="height" size="25" class="required" value="200" minlength="2" />
+	<button id="update">Update</button>
+</div>
+
+<ol id="drags">
+</ol>
+
+</body>
+</html>

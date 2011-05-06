@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>Demo: DOM Functions</title>
+		<style tupe="text/css" charset="utf-8">
+			li.test { font-weight: bold; }	
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+			// entry point
+			$(document).ready(function() {
+				// dom constructed, let's roll!!
+
+				$("a").click(function(evt) {
+				 evt.preventDefault();
+				 $(this).hide("slow");
+				});
+
+				$("li").addClass("test");
+				// $("a").removeClass("test");
+			})
+		</script>
+	</head>
+	<body>
+		<h1>Demo: DOM Functions</h1>
+		<a href="google.com">Google</a>
+		<ul id="list">
+			<li id="one">One</li>
+			<li id="two">Two</li>
+			<li id="three">Three</li>
+			<li id="four">Four</li>
+			<li id="five">Five</li>
+		</ul>
+	</body>
+</html>

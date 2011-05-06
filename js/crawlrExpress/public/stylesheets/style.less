@@ -1,17 +1,23 @@
-@border: 2px solid grey;
+@brown: #952;
+@dark:  #521;
+@dull:  #643;
+@red:   #f31;
+
+@border: 2px solid @red;
 
 a {
 	color: #00B7FF;
 }
 
-#error {
-	color: red;
+.error {
+	color: @red;
 }
 
 html, body {
 	color: white;
-	background: black;
-	margin: 0;	
+	background: @brown;
+	width: 85%;
+	margin: 0 auto;	
 	padding: 0;
 	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -20,8 +26,17 @@ html, body {
 	clear: both;
 	float: left;
 	width: 100%;
-	background: #444;
+	padding: .5em;
+	background: @dull;
 	border-bottom: @border;
+}
+
+#head form {
+	float: left;
+}
+
+#head div  {
+	float: right;
 }
 
 #wrap {
@@ -30,6 +45,7 @@ html, body {
 	clear: both;
 	float: left;
 	width: 100%;
+	padding: .5em;
 	overflow: hidden;
 }
 
@@ -48,7 +64,8 @@ html, body {
 }
 
 #footer {
-	background: #444;
+	background: @dull;
+	padding: .5em;
 	clear: both;
 	float: left;
 }

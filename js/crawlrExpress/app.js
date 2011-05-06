@@ -4,8 +4,7 @@
 
 var express = require('express'),
 	crypto  = require('crypto'),
-    crawlr  = require('./crawlrCB.js');
-
+    crawlr  = require('../node/dumpTreeCB.js');
 
 var app = module.exports = express.createServer();
 
@@ -45,7 +44,7 @@ app.dynamicHelpers({
 });
 
 // app globals
-var trees_by_session_id = {};
+var trees_by_session = {};
 
 var users = {
 	cryptix: {
@@ -56,9 +55,7 @@ var users = {
 };
 
 // helper functions
-function md5(str) {
-	return crypto.createHash('md5').update(str).digest('hex');
-}
+function md5(str) { return crypto.createHash('md5').update(str).digest('hex'); }
 
 
 // route helpers
@@ -91,9 +88,8 @@ app.get('/login', function(req, res) {
 		req.session.success = 'Authenticated as ' + req.session.user.name
 					+ ' click to <a href="/logout">Logout</a>. '
 					+ ' You may now access <a href="/files">/files</a>';
-	}
-
-	res.render('login');
+		res.redirect('/files');
+	} else res.render('login');
 });
 
 app.post('/login', function(req, res) {
@@ -120,22 +116,30 @@ app.get('/logout', function(req, res) {
 
 /* files app logic */
 app.get('/files', restrict, function(req, res) {
-	res.render('files');
+	var tree = trees_by_session[req.sessionID];
+	if(tree) {
+		res.render('files', {
+			user: req.session.user.name,
+			current: req.session.current,
+			tree:  tree.children,
+			files: tree.leaves
+		});
+	} else res.render('askDir');
 });
 
 app.post('/setDir', restrict, function(req, res) {
 	var path = req.body.current;
 	if(path) {
 		req.session.current = path;
-		if(!trees_by_session_id[path]) {
+		if(!trees_by_session[req.sessionID]) {
 			crawlr.buildTree(path, function(tree) {
-				trees_by_session_id[path] = tree;
-				res.redirect('/');
+				trees_by_session[req.sessionID] = tree;
+				res.redirect('/files');
 			});
 		}
-	} else {
-		delete req.session.current
-	}
+	} else req.session.destroy(function(err) {
+		res.redirect('/');
+	});
 });
 
 // Ajax calls

@@ -2,8 +2,13 @@ h1 Crawlr
 div#head
 	- if(message)
 		div.message!=message
-	div#user
-   		p Hello #{user}
+	form(method="post", action="/setDir")
+		label(for:"current") Directory to crawl:
+		input(type:"text", id:"current", name:"current", value: current)
+		button#change Change
+	div
+		p Hello #{user}
+		a(href="/logout") Logout
 div#wrap
 	div#tree
 		h2 Tree

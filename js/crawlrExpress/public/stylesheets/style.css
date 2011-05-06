@@ -1,13 +1,14 @@
 a {
   color: #00B7FF;
 }
-#error {
-  color: red;
+.error {
+  color: #ff3311;
 }
 html, body {
   color: white;
-  background: black;
-  margin: 0;
+  background: #995522;
+  width: 85%;
+  margin: 0 auto;
   padding: 0;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
@@ -15,14 +16,23 @@ html, body {
   clear: both;
   float: left;
   width: 100%;
-  background: #444;
-  border-bottom: 2px solid grey;
+  padding: .5em;
+  background: #664433;
+  border-bottom: 2px solid #ff3311;
+}
+#head form {
+  float: left;
+}
+#head div {
+  float: right;
 }
 #wrap {
+  background: #222;
   position: relative;
   clear: both;
   float: left;
   width: 100%;
+  padding: .5em;
   overflow: hidden;
 }
 #tree {
@@ -30,7 +40,7 @@ html, body {
   float: left;
   position: relative;
   width: 250px;
-  border-right: 2px solid grey;
+  border-right: 2px solid #ff3311;
 }
 #files {
   background: #888;
@@ -38,7 +48,8 @@ html, body {
   width: 750px;
 }
 #footer {
-  background: #444;
+  background: #664433;
+  padding: .5em;
   clear: both;
   float: left;
 }

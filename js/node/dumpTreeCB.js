@@ -1,14 +1,15 @@
 var tree = require('./tree.js'),
-	findSync = require('findit').findSync,
 	fs = require('fs');
 
 exports.buildTree = function (path, next) {
 	var treeRoot = new tree.limb('root');
+	treeRoot.path = path;
 
 	var files = findSync(path);
 	var len = files.length;
 	files.forEach(function (file) {
 		fs.stat(file, function(err, stat) {
+			if(err) throw err
 			len--;
 			if(stat.isFile()) {
 				treeRoot.addLeave(file, stat);

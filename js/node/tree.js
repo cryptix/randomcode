@@ -1,7 +1,6 @@
 // a single element 
-exports.limb = function(name, parent) {
+exports.limb = function(name) {
 	this.name = name;
-	this.parent = parent ? parent : undefined;
 
 	// Leaves
 	this.leaves = []; // ie files
@@ -52,7 +51,7 @@ exports.limb = function(name, parent) {
 			console.log("[tree]  we found the dir?.. ");
 			console.log("\tpath:" + path);
 		} else {
-			var newParent = new exports.limb(newPath[0], root);
+			var newParent = new exports.limb(newPath[0]);
 			root.children[newPath[0]] = newParent;
 			if(newPath.length > 1) // go on if you have more to add
 				newParent.addChild(newPath.slice(1));

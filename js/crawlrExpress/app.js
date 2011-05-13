@@ -44,8 +44,6 @@ app.dynamicHelpers({
 });
 
 // app globals
-var trees_by_session = {};
-
 var users = {
 	cryptix: {
 		name: 'cryptix',
@@ -116,27 +114,24 @@ app.get('/logout', function(req, res) {
 
 /* files app logic */
 app.get('/files', restrict, function(req, res) {
-	var tree = trees_by_session[req.sessionID];
-	if(tree) {
+	var cwd = req.session.cwd;
+	if(cwd) {
+                dirs = magic.foo(cwd);
+                files = magic.foo(cwd);
+
 		res.render('files', {
 			user: req.session.user.name,
-			current: req.session.current,
-			tree:  tree.children,
-			files: tree.leaves
+			cwd: req.session.cwd,
+			dirs: dirs,
+			files: files
 		});
 	} else res.render('askDir');
 });
 
-app.post('/setDir', restrict, function(req, res) {
-	var path = req.body.current;
-	if(path) {
-		req.session.current = path;
-		if(!trees_by_session[req.sessionID]) {
-			crawlr.buildTree(path, function(tree) {
-				trees_by_session[req.sessionID] = tree;
-				res.redirect('/files');
-			});
-		}
+app.post('/setCwd', restrict, function(req, res) {
+	var cwd = req.body.cwd;
+	if(cwd) { // do some checking..???? TODO
+		req.session.cwd = cwd;
 	} else req.session.destroy(function(err) {
 		res.redirect('/');
 	});

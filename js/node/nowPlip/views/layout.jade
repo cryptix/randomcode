@@ -1,0 +1,22 @@
+!!!
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js')
+    script(type='text/javascript', src='/nowjs/now.js')
+    script(type='text/javascript')
+      $(document).ready(function() {
+        now.ready(function() {
+          now.name = prompt("What's your name?", "");
+          now.getMsg = function(name, msg) {
+            $('#messages').append('<li>' + name + ': ' + msg + '</li>');
+            alert(now.users);
+          }
+        });
+        $('#send-msg').click(function() {
+          now.distributeMsg($('#msg-input').val());
+          $('#msg-input').val('');
+        });
+      });
+  body!= body

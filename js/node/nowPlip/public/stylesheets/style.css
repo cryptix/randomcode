@@ -1,0 +1,21 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+#chat {
+  padding: 1em;
+  border: 2px solid gray;
+}
+
+#chat > h3 {
+  background-color: #eee;
+}
+
+#chat > ul {
+  list-style-position: outside;
+}

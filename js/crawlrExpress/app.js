@@ -155,15 +155,14 @@ everyone.disconnected(function() {
 }); // Setdown
 
 everyone.now.lsDir = function(dir) {
-	if(path.existsSync(this.now.cwd)) { // do some checking..???? TODO
-		var newd;
-		if(dir === '..') {
-			newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1 } ).join('/');
-		} else {
-			newd = path.join(this.now.cwd,dir);
-		}
-		daf.dump(newd, function(err, files, dirs){
-			everyone.now.render(files, dirs, newd);
-		});
-	} else console.log('no valid dir....');
+	var newd;
+	if(dir === '..') {
+		newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1 } ).join('/');
+	} else {
+		newd = path.join(this.now.cwd,dir);
+	}
+	daf.dump(newd, function(err, files, dirs){
+		if(err) return console.log('no valid dir....' + err);
+		everyone.now.render(files, dirs, newd);
+	});
 };

@@ -40,10 +40,15 @@ app.dynamicHelpers({
 			msg = req.session.success;
 		delete req.session.error;
 		delete req.session.success;
-		if(err) return '<p class="error">' + err + '</p>';
-		if(msg) return '<p class="success">' + msg + '</p>';
+		if(err) { return '<p class="error">' + err + '</p>'; }
+		if(msg) { return '<p class="success">' + msg + '</p>'; }
 	}
 });
+
+// helper functions
+function md5(str) { 
+	return crypto.createHash('md5').update(str).digest('hex');
+}
 
 // app globals
 var users = {
@@ -54,20 +59,17 @@ var users = {
 	}
 };
 
-// helper functions
-function md5(str) { return crypto.createHash('md5').update(str).digest('hex'); };
-
 
 // route helpers
 function authenticate(name, pass, fn) {
 	var user = users[name];
 
-	if(!user) return fn(new Error('Cannot find user'));
+	if(!user) { return fn(new Error('Cannot find user')); }
 
-	if(user.pass == md5(pass + user.salt)) return fn(null, user);
+	if(user.pass === md5(pass + user.salt)) { return fn(null, user); }
 
 	fn(new Error('invalid password'));
-};
+}
 
 function restrict(req, res, next) {
 	if(req.session.user) {
@@ -76,7 +78,7 @@ function restrict(req, res, next) {
 		req.session.error = 'Access denied!';
 		res.redirect('/login');
 	}
-};
+}
 
 /*
  * Routes
@@ -93,7 +95,9 @@ app.get('/login', function(req, res) {
 					+ ' You may now access <a href="/files">/files</a>';
 		*/
 		res.redirect('/files');
-	} else res.render('login');
+	} else {
+		res.render('login');
+	}
 });
 
 app.post('/login', function(req, res) {
@@ -105,7 +109,7 @@ app.post('/login', function(req, res) {
 				res.redirect('back');
 			});
 		} else {
-			req.session.error = 'Authentication failed, please check your username and password.'
+			req.session.error = 'Authentication failed, please check your username and password.';
 			res.redirect('back');
 		}
 	});
@@ -123,18 +127,16 @@ app.get('/logout', function(req, res) {
  */
 app.get('/files', restrict, function(req, res) {
 	res.render('files', {
-		user: req.session.user.name,
-	})
+		user: req.session.user.name
+	});
 });
-
-
 
 
 // Only listen on $ node app.js
 if (!module.parent) {
 	app.listen(8080, '192.168.1.9');
 	console.log("Express server listening on port %d", app.address().port);
-};
+}
 
 /*
  * now
@@ -142,27 +144,35 @@ if (!module.parent) {
 var everyone = nowjs.initialize(app);
 
 everyone.connected(function() {
+	// initiate
 	this.now.cwd = "/Users/cryptix";
-    console.log("Setup");
-
     console.dir(this);
-}); // Setup
+// console.log("Setup");
+    // console.dir(this);
+}); 
 
 everyone.disconnected(function() {
-    console.log("Setdown");
-
-    console.dir(this);
-}); // Setdown
+    // console.log("Setdown");
+    // console.dir(this);
+});
 
 everyone.now.lsDir = function(dir) {
 	var newd;
 	if(dir === '..') {
-		newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1 } ).join('/');
+		newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1; } ).join('/');
 	} else {
 		newd = path.join(this.now.cwd,dir);
 	}
-	daf.dump(newd, function(err, files, dirs){
-		if(err) return console.log('no valid dir....' + err);
+	daf.dirsAndFiles(newd, function(err, files, dirs){
+		if(err) { return console.log('no valid dir....' + err); }
 		everyone.now.render(files, dirs, newd);
+	});
+};
+
+
+everyone.now.getFile = function(fname, cb) {
+	daf.getFile(path.join(this.now.cwd, fname), function(err, obj) {
+		if(err) { return console.log('file error' + err); }
+		everyone.now.showFile(obj);
 	});
 };

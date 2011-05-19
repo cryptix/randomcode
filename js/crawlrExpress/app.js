@@ -132,7 +132,7 @@ app.get('/files', restrict, function(req, res) {
 
 // Only listen on $ node app.js
 if (!module.parent) {
-	app.listen(8080, '192.168.1.9');
+	app.listen(8081, '85.25.11.45');
 	console.log("Express server listening on port %d", app.address().port);
 };
 
@@ -142,7 +142,7 @@ if (!module.parent) {
 var everyone = nowjs.initialize(app);
 
 everyone.connected(function() {
-	this.now.cwd = "/Users/cryptix";
+	this.now.cwd = "/home/cryptix";
     console.log("Setup");
 
     console.dir(this);

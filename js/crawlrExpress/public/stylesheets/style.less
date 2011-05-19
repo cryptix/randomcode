@@ -1,9 +1,14 @@
-@brown: #952;
+@white: #eeeeec;
+@black: #2e3436;
+@brown: #C60;
+
 @dark:  #521;
 @dull:  #643;
-@red:   #f31;
+@red:   #c00;
+@green: #8ae234;
+@blue:  #729fcf;
 
-@border: 2px solid @red;
+@border: 3px solid lightgrey;
 
 a {
 	color: #00B7FF;
@@ -14,20 +19,32 @@ a {
 }
 
 html, body {
-	color: white;
-	background: @brown;
-	width: 85%;
-	margin: 0 auto;	
-	padding: 0;
+	color: @black;
+	background: @white;
+	min-width: 1000px;
+	margin: 0 auto;
+	width: 80%;
+
 	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.selected {
+	background-color: @dull;
+}
+
+#wrap {
+	background-color: #fff;
+	position: relative;
+	clear: both;
+	float: left;
+	
 }
 
 #head {
 	clear: both;
 	float: left;
 	width: 100%;
-	padding: .5em;
-	background: @dull;
+	background: @blue;
 	border-bottom: @border;
 }
 
@@ -39,34 +56,37 @@ html, body {
 	float: right;
 }
 
-#wrap {
-	background: #222;
-	position: relative;
-	clear: both;
-	float: left;
-	width: 100%;
-	padding: .5em;
-	overflow: hidden;
+#cwd {
+	width: 14cm;
 }
 
+
 #tree {
-	background: #666;
+	background-color: #fff;
 	float: left;
 	position: relative;
-	width: 250px;
+	width: 17%;
+	margin-left: 2%;
 	border-right: @border;
 }
 
+#tree ul li:hover {  background-color: @green; }
+
 #files {
-	background: #888;
+	margin-left: 2%;
+	background: #fff;
 	float: left;
-	width: 750px;
+	width: 75%;
+}
+#files table {
+	width: 100%;
 }
 
+#files table tbody tr:hover { background-color: @green;}
 #footer {
-	background: @dull;
-	padding: .5em;
+	background: @blue;
+	padding: 5px 3% 5px 3%;
 	clear: both;
-	float: left;
+	width: 94%;
 }
 

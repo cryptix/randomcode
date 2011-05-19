@@ -4,7 +4,9 @@
 
 var express = require('express'),
 	crypto  = require('crypto'),
-    crawlr  = require('../node/dumpTreeCB.js');
+	path = require('path'),
+	nowjs = require('now'),
+	daf  = require('../node/dumpDaF.js');
 
 var app = module.exports = express.createServer();
 
@@ -53,7 +55,7 @@ var users = {
 };
 
 // helper functions
-function md5(str) { return crypto.createHash('md5').update(str).digest('hex'); }
+function md5(str) { return crypto.createHash('md5').update(str).digest('hex'); };
 
 
 // route helpers
@@ -65,7 +67,7 @@ function authenticate(name, pass, fn) {
 	if(user.pass == md5(pass + user.salt)) return fn(null, user);
 
 	fn(new Error('invalid password'));
-}
+};
 
 function restrict(req, res, next) {
 	if(req.session.user) {
@@ -74,18 +76,22 @@ function restrict(req, res, next) {
 		req.session.error = 'Access denied!';
 		res.redirect('/login');
 	}
-}
+};
 
-// Routes
+/*
+ * Routes
+ */
 app.get('/', function(req, res) {
 	res.redirect('/login');
 });
 
 app.get('/login', function(req, res) {
 	if(req.session.user) {
+		/*
 		req.session.success = 'Authenticated as ' + req.session.user.name
 					+ ' click to <a href="/logout">Logout</a>. '
 					+ ' You may now access <a href="/files">/files</a>';
+		*/
 		res.redirect('/files');
 	} else res.render('login');
 });
@@ -112,53 +118,52 @@ app.get('/logout', function(req, res) {
 });
 
 
-/* files app logic */
+/*
+ * files
+ */
 app.get('/files', restrict, function(req, res) {
-	var cwd = req.session.cwd;
-	if(cwd) {
-                dirs = magic.foo(cwd);
-                files = magic.foo(cwd);
-
-		res.render('files', {
-			user: req.session.user.name,
-			cwd: req.session.cwd,
-			dirs: dirs,
-			files: files
-		});
-	} else res.render('askDir');
+	res.render('files', {
+		user: req.session.user.name,
+	})
 });
 
-app.post('/setCwd', restrict, function(req, res) {
-	var cwd = req.body.cwd;
-	if(cwd) { // do some checking..???? TODO
-		req.session.cwd = cwd;
-	} else req.session.destroy(function(err) {
-		res.redirect('/');
-	});
-});
 
-// Ajax calls
-/* TODO: Socket.IO
-app.get('/ajax/status', ajaxCheckSession, function(req, res) {
-	res.send(req.session.current);
-});
 
-app.get('/ajax/files', ajaxCheckSession, function(req, res) {
-	res.send(trees_by_session_id[req.session.current].leaves);
-});
-
-app.get('/ajax/tree', ajaxCheckSession, function(req, res) {
-	console.log(req.session.id);
-	/* TODO: handle trees globaly
-	crawlr.buildTree(req.session.dir, function(tree) {
-		res.send(JSON.stringify(tree));
-	});
-	
-});
-*/
 
 // Only listen on $ node app.js
 if (!module.parent) {
-  app.listen(3000);
-  console.log("Express server listening on port %d", app.address().port);
-}
+	app.listen(8080, '192.168.1.9');
+	console.log("Express server listening on port %d", app.address().port);
+};
+
+/*
+ * now
+ */
+var everyone = nowjs.initialize(app);
+
+everyone.connected(function() {
+	this.now.cwd = "/Users/cryptix";
+    console.log("Setup");
+
+    console.dir(this);
+}); // Setup
+
+everyone.disconnected(function() {
+    console.log("Setdown");
+
+    console.dir(this);
+}); // Setdown
+
+everyone.now.lsDir = function(dir) {
+	if(path.existsSync(this.now.cwd)) { // do some checking..???? TODO
+		var newd;
+		if(dir === '..') {
+			newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1 } ).join('/');
+		} else {
+			newd = path.join(this.now.cwd,dir);
+		}
+		daf.dump(newd, function(err, files, dirs){
+			everyone.now.render(files, dirs, newd);
+		});
+	} else console.log('no valid dir....');
+};

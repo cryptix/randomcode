@@ -1,53 +1,47 @@
-function setCurrentDir() {
-	dojo.xhrGet({
-		url: "ajax/status",
-		load: function(result) {
-			dojo.byId("current").value = result;
-		}
-	});
+function TreeElem(name) {
+	var li = $('<li>'+name+'</li>');
+	li.click(function() {
+        now.lsDir(name);
+    });
+
+	return li;
 }
 
-function updateFiles() {
-	dojo.xhrGet({
-		url: "ajax/files",
-		handleAs: "json",
-		load: function(result) {
-			var ftable = dojo.query("#files table")[0];
-				
-			dojo.forEach(result, function(item, index) {
-				var tr = dojo.create("tr", {}, ftable);
-
-				dojo.create("td", {innerHTML: item.name}, tr);
-				dojo.create("td", {innerHTML: item.size}, tr);
-				dojo.create("td", {innerHTML: item.mtime}, tr);
-			});
-		}
-	});
-}
-
-function setupUI() {
-	var change = dojo.byId("change"),
-		refresh = dojo.byId("refresh");
+function FileRow(name, stat) {
+	var tr = $('<tr></tr>');
 	
-	// bind events
-	dojo.connect(change, "onclick", function(evt) {
-		dojo.xhrPost({
-			url: "setDir",
-			form: dojo.byId("currentForm"),
-			error: function(msg) {
-				alert("Error:"+msg);
-				// TODO: handle error
-			},
-		}); // TODO: send new directory to list
-	});
+	tr.append($('<td>' + name + '</td>'));
+	tr.append($('<td>' + stat.size + '</td>'));
+	tr.append($('<td>' + stat.mtime + '</td>'));
 
-	dojo.connect(refresh, "onclick", setCurrentDir );
-
-	// pull initial data
-	//setCurrentDir();
-
+	return tr;
 }
 
 
-dojo.ready(function() {
+    // now
+now.ready(function() {
+	$(document).ready(function() {
+        now.render = function(files, dirs, newd) {
+			$('#cwd')[0].value = now.cwd = newd;
+			$('#tree > ul > li').remove();
+			$('#files > table > tbody > tr').remove();
+			
+			$('#tree > ul').append(TreeElem('..'));
+			for (var d in dirs) {
+				if(dirs.hasOwnProperty(d)) {
+					$('#tree > ul').append(TreeElem(d));
+				}
+			}
+			
+			for (var f in files) {
+				if(files.hasOwnProperty(f)) {
+					$('#files > table > tbody').append(FileRow(f, files[f]));
+				}
+			}
+			
+        };
+	
+		$('#tree > ul').append(TreeElem('..'));	
+		setTimeout(function() {now.lsDir('.');}, 1000)
+    });
 });

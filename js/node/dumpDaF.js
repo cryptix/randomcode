@@ -11,12 +11,16 @@ exports.dump = function(dir, cb) {
 		.seq(function() {
 			fs.readdir(dir, this);
 		})
+		.catch(function (err) {
+			err.dir = dir;
+			throw err;
+		})
 		.flatten()
 		.parEach(function(file, index) {
 			fs.lstat(path.join(dir,file), this.into(file));
 		})
 		.seq(function() {
-			var files = Hash.filter(this.vars, function(item) {return item.isFile() || item.isSymbolicLink()});
+			var files = Hash.filter(this.vars, function(item) {return !item.isDirectory()});
 			var dirs  = Hash.filter(this.vars, function(item) {return item.isDirectory()});
 			cb(null, files, dirs);
 		})
@@ -32,8 +36,11 @@ if(!module.parent) {
 	    console.dir(files);
 
 	    console.log("\n\nDirs:");
+		for(var d in dirs) {
+			if(dirs.hasOwnProperty(d)) {
+				console.log(d);
+			}
+		}
 	    console.dir(dirs);
-		
-		for()
 	});
 };

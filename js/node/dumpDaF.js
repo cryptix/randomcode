@@ -11,13 +11,14 @@ exports.dump = function(dir, cb) {
 		.seq(function() {
 			fs.readdir(dir, this);
 		})
-		.catch(function (err) {
-			err.dir = dir;
-			throw err;
-		})
 		.flatten()
 		.parEach(function(file, index) {
 			fs.lstat(path.join(dir,file), this.into(file));
+		})
+		.catch(function (err) {
+			err.dir = dir;
+			console.error(err.stack ? err.stack : err)
+			cb(err, null, null);
 		})
 		.seq(function() {
 			var files = Hash.filter(this.vars, function(item) {return !item.isDirectory()});

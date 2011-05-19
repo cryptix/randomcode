@@ -1,12 +1,14 @@
 /*
- * looks into a dir and splits the content into directories and files + stats
+ * 
  */
 var Seq = require('seq'),
 	Hash = require('hashish'),
+	mime = require('mime'),
     path = require('path'),
     fs = require('fs');
 
-exports.dump = function(dir, cb) {
+// looks into a dir and splits the content into directories and files + stats
+exports.dirsAndFiles = function(dir, cb) {
 	Seq()
 		.seq(function() {
 			fs.readdir(dir, this);
@@ -24,7 +26,28 @@ exports.dump = function(dir, cb) {
 			var files = Hash.filter(this.vars, function(item) {return !item.isDirectory()});
 			var dirs  = Hash.filter(this.vars, function(item) {return item.isDirectory()});
 			cb(null, files, dirs);
-		})
+		});
+};
+
+// lets see
+exports.getFile = function(path, cb) {
+	var obj = {
+		path: path,
+		mime: mime.lookup(path)
+	};
+	fs.readFile(path, function(err, buf) {
+		if (err) cb(err, null);
+		switch (obj.mime) {
+			case 'image/jpeg':
+			case 'image/png':
+				obj.b64 = buf.toString('base64');
+				break;
+			case 'application/octet-stream':
+				obj.str = buf.toString('utf8');
+				break;
+		}
+		cb(null, obj);
+	});
 };
 
 if(!module.parent) {

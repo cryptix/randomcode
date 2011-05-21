@@ -3,8 +3,7 @@ div#wrap
 	div#head
 		- if(message)
 			div.message!=message	
-		label(for:"cwd") Directory to crawl:
-		input(type:"text", id:"cwd", name:"cwd")
+		ul#cwd
 
 		div#user
 			p Hello #{user}

@@ -14,15 +14,21 @@ var humansize = (function() {
 
 // UI elements
 function TreeElem(name) {
-	var li = $('<li>'+name+'</li>');
+	var li = $('<li></li>').text(name);
 	
 	li.click(function() {
+		$('#cwd > li').remove();
+		$('#tree > ul > li').remove();
+		$('#tree > ul').append(TreeElem('..'));
+		$('#files > table > tbody > tr').remove();
 		$.post('files/lsDir', 
 			{ 'newd': name },
 			function(data) {
-				$('#tree > ul > li').remove();
-				$('#files > table > tbody > tr').remove();
-            
+				
+				data.c.split('/').forEach(function(e) {
+					$('#cwd').append($('<li></li>').text(e));
+				});
+				
 				for (var d in data.d) {
 					if(data.d.hasOwnProperty(d)) {
 						$('#tree > ul').append(TreeElem(d));
@@ -35,7 +41,6 @@ function TreeElem(name) {
 					}
 				}
             
-				$('#tree > ul').append(TreeElem('..'));
 			}, 'json');
 	});
 
@@ -45,25 +50,43 @@ function TreeElem(name) {
 function FileRow(name, stat) {
 	var tr = $('<tr></tr>');
 	
-	tr.append($('<td>' + name + '</td>'));
-	tr.append($('<td>' + humansize(stat.size) + '</td>'));
-	tr.append($('<td>' + stat.mtime + '</td>'));
+	tr.append($('<td></td>').text(name));
+	tr.append($('<td></td>').text(humansize(stat.size)));
+	tr.append($('<td></td>').text(stat.mtime));
 
 
 	tr.click(function() {
-		if(obj.b64 !== undefined) {
-			var img = $('<img>');
-			$('#files > table').hide('slow');
-			
-			img.attr('src', 'data:'+obj.mime+';base64,'+obj.b64);
-			img.css({width:'750px'});
-			img.click(function() {
-				$(this).remove();
-				$('#files > table').show('fast');
-			});
-			
-			$('#files').append(img);
-		}
+		$('#files > table').hide('slow');
+		$.post('files/getFile', 
+			{ 'fname': name },
+			function(obj) {
+				var file;
+				if(obj.b64 !== undefined) {
+				  file = $('<img>');
+				  
+				  file.attr('src', 'data:'+obj.mime+';base64,'+obj.b64);
+				  file.css({width:'750px'});
+				} else if (typeof obj.str === 'string') {
+				  file = $('<pre></pre>');
+				
+				  file.text(obj.str);
+				} else {
+				  file = $('<p>Error</p>');
+				  var ul = $('<ul></ul>');
+				
+				  ul.append('<li>' + obj.path + '</li>');
+				  ul.append('<li>' + obj.mime + '</li>');
+				
+				  file.append(ul);
+				}
+				
+				file.click(function() {
+				   $(this).remove();
+				   $('#files > table').show('fast');
+				});
+				
+				$('#files').append(file);
+			}, 'json');
 	});
 	
 	return tr;

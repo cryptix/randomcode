@@ -45,7 +45,12 @@ exports.getFile = function(path, cb) {
 			case 'image/png':
 				obj.b64 = buf.toString('base64');
 				break;
+			case 'text/html':
+			case 'text/plain':
+			case 'text/x-c':
+			case 'application/javascript':
 			case 'application/octet-stream':
+			case 'application/x-sh':
 				obj.str = buf.toString('utf8');
 				break;
 		}

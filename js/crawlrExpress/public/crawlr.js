@@ -17,8 +17,27 @@ function TreeElem(name) {
 	var li = $('<li>'+name+'</li>');
 	
 	li.click(function() {
-        now.lsDir(name);
-    });
+		$.post('files/lsDir', 
+			{ 'newd': name },
+			function(data) {
+				$('#tree > ul > li').remove();
+				$('#files > table > tbody > tr').remove();
+            
+				for (var d in data.d) {
+					if(data.d.hasOwnProperty(d)) {
+						$('#tree > ul').append(TreeElem(d));
+					}
+				}
+            
+				for (var f in data.f) {
+					if(data.f.hasOwnProperty(f)) {
+						$('#files > table > tbody').append(FileRow(f, data.f[f]));
+					}
+				}
+            
+				$('#tree > ul').append(TreeElem('..'));
+			}, 'json');
+	});
 
 	return li;
 }
@@ -32,52 +51,30 @@ function FileRow(name, stat) {
 
 
 	tr.click(function() {
-		now.getFile(name);
+		if(obj.b64 !== undefined) {
+			var img = $('<img>');
+			$('#files > table').hide('slow');
+			
+			img.attr('src', 'data:'+obj.mime+';base64,'+obj.b64);
+			img.css({width:'750px'});
+			img.click(function() {
+				$(this).remove();
+				$('#files > table').show('fast');
+			});
+			
+			$('#files').append(img);
+		}
 	});
 	
 	return tr;
 }
 
+$(document).ready(function() {
 
-// now
-now.ready(function() {
-	$(document).ready(function() {
-        now.render = function(files, dirs, newd) {
-			$('#cwd')[0].value = now.cwd = newd;
-			$('#tree > ul > li').remove();
-			$('#files > table > tbody > tr').remove();
-			
-			$('#tree > ul').append(TreeElem('..'));
-			for (var d in dirs) {
-				if(dirs.hasOwnProperty(d)) {
-					$('#tree > ul').append(TreeElem(d));
-				}
-			}
-			
-			for (var f in files) {
-				if(files.hasOwnProperty(f)) {
-					$('#files > table > tbody').append(FileRow(f, files[f]));
-				}
-			}	
-        };
-
-		now.showFile = function(obj) {
-			if(obj.b64 !== undefined) {
-				var img = $('<img>');
-				$('#files > table').hide('slow');
-				
-				img.attr('src', 'data:'+obj.mime+';base64,'+obj.b64);
-				img.css({width:'750px'});
-				img.click(function() {
-					$(this).remove();
-					$('#files > table').show('fast');
-				});
-				
-				$('#files').append(img);
-			}
-		};
+	$('.error').hide('slow');
+	$('.success').hide('slow');
 	
-		$('#tree > ul').append(TreeElem('..'));	
-		setTimeout(function() {now.lsDir('.');}, 1000)
-    });
+	$('#tree > ul').append(TreeElem('..'));	
+	setTimeout(function() {;}, 1000)
 });
+

@@ -36,7 +36,10 @@ exports.getFile = function(path, cb) {
 		mime: mime.lookup(path)
 	};
 	fs.readFile(path, function(err, buf) {
-		if (err) cb(err, null);
+		if (err) {
+			err.path = path;
+			cb(err, null);
+		}
 		switch (obj.mime) {
 			case 'image/jpeg':
 			case 'image/png':

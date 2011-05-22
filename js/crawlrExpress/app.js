@@ -5,7 +5,8 @@
 var express = require('express'),
 	crypto  = require('crypto'),
 	path = require('path'),
-	daf  = require('../node/dumpDaF.js');
+	daf  = require('../node/dumpDaF.js'),
+	v8p = require("v8-profiler");
 
 var app = module.exports = express.createServer();
 

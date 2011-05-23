@@ -1,83 +1,116 @@
 // helper
 var humansize = (function() {
-	var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-	return function(size) {
-		var i = 0;
-	    while(size >= 1024) {
-	        size /= 1024;
-	        ++i;
-	    }
-		return size.toFixed(1) + ' ' + units[i];
-	};
-}());
+    return function(size) {
+        var i = 0;
+        while (size >= 1024) {
+            size /= 1024;
+            ++i;
+        }
+        return size.toFixed(1) + ' ' + units[i];
+    };
+} ());
 
 // UI elements
-function TreeElem(name) {
-	var li = $('<li>'+name+'</li>');
-	
-	li.click(function() {
-        now.lsDir(name);
-    });
-
-	return li;
-}
 
 function FileRow(name, stat) {
-	var tr = $('<tr></tr>');
-	
-	tr.append($('<td>' + name + '</td>'));
-	tr.append($('<td>' + humansize(stat.size) + '</td>'));
-	tr.append($('<td>' + stat.mtime + '</td>'));
+    var tr = $('<tr></tr>');
+
+    tr.append($('<td></td>').text(name));
+    tr.append($('<td></td>').text(humansize(stat.size)));
+    tr.append($('<td></td>').text(stat.mtime));
 
 
-	tr.click(function() {
-		now.getFile(name);
-	});
-	
-	return tr;
+    tr.click(function() {
+        $('#files > table').hide('slow');
+        $.post('files/getFile',
+        {
+            'fname': name
+        },
+        function(obj) {
+            var file;
+            if (obj.b64 !== undefined) {
+                file = $('<img>');
+
+                file.attr('src', 'data:' + obj.mime + ';base64,' + obj.b64);
+                file.css({
+                    width: '750px'
+                });
+            } else if (typeof obj.str === 'string') {
+                file = $('<pre></pre>');
+
+                file.text(obj.str);
+            } else {
+                file = $('<p>Error</p>');
+                var ul = $('<ul></ul>');
+
+                ul.append('<li>' + obj.path + '</li>');
+                ul.append('<li>' + obj.mime + '</li>');
+
+                file.append(ul);
+            }
+
+            file.click(function() {
+                $(this).remove();
+                $('#files > table').show('fast');
+            });
+
+            $('#files').append(file);
+        },
+        'json');
+    });
+
+    return tr;
 }
 
+function TreeElem(name) {
+    var li = $('<li></li>').text(name);
 
-// now
-now.ready(function() {
-	$(document).ready(function() {
-        now.render = function(files, dirs, newd) {
-			$('#cwd')[0].value = now.cwd = newd;
-			$('#tree > ul > li').remove();
-			$('#files > table > tbody > tr').remove();
-			
-			$('#tree > ul').append(TreeElem('..'));
-			for (var d in dirs) {
-				if(dirs.hasOwnProperty(d)) {
-					$('#tree > ul').append(TreeElem(d));
-				}
-			}
-			
-			for (var f in files) {
-				if(files.hasOwnProperty(f)) {
-					$('#files > table > tbody').append(FileRow(f, files[f]));
-				}
-			}	
-        };
+    li.click(function() {
+        $('#cwd > li').remove();
+        $('#tree > ul > li').remove();
+        $('#tree > ul').append(TreeElem('..'));
+        $('#files > table > tbody > tr').remove();
+        $.post('files/lsDir',
+        {
+            'newd': name
+        },
+        function(data) {
+            var d, f;
+            
+            data.c.split('/').forEach(function(e) {
+                $('#cwd').append($('<li></li>').text(e));
+            });
 
-		now.showFile = function(obj) {
-			if(obj.b64 !== undefined) {
-				var img = $('<img>');
-				$('#files > table').hide('slow');
-				
-				img.attr('src', 'data:'+obj.mime+';base64,'+obj.b64);
-				img.css({width:'750px'});
-				img.click(function() {
-					$(this).remove();
-					$('#files > table').show('fast');
-				});
-				
-				$('#files').append(img);
-			}
-		};
-	
-		$('#tree > ul').append(TreeElem('..'));	
-		setTimeout(function() {now.lsDir('.');}, 1000)
+            for (d in data.d) {
+                if (data.d.hasOwnProperty(d)) {
+                    $('#tree > ul').append(TreeElem(d));
+                }
+            }
+
+            for (f in data.f) {
+                if (data.f.hasOwnProperty(f)) {
+                    $('#files > table > tbody').append(FileRow(f, data.f[f]));
+                }
+            }
+
+        },
+        'json');
     });
+
+    return li;
+}
+
+$(document).ready(function() {
+
+    $('.error').hide('slow');
+    $('.success').hide('slow');
+
+    
+    setTimeout(function() {
+        $('#tree > ul').append(TreeElem('..'));
+        TreeElem('.').click();
+    }, 1000)
 });
+

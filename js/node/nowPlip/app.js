@@ -37,25 +37,22 @@ app.get('/', function(req, res){
   });
 });
 
-app.listen(8080, '192.168.1.12');
+app.listen(8080, '192.168.1.9');
 
-var everyone = nowjs.initialize(app);
+
 
 // Now
-everyone.now.users = []
+var everyone = nowjs.initialize(app);
 
 everyone.connected(function() {
     console.log("Setup");
-    everyone.now.users.push(this.now.name);
+
     console.dir(this);
 }); // Setup
 
 everyone.disconnected(function() {
     console.log("Setdown");
-    var newUsers = [];
-    newUsers = everyone.now.users.join('\n').replace(this.now.name, '').split('\n')
-    newUsers = newUsers.filter(function(elem, index, array) { return (elem.length > 0) });
-    this.now.users = newUsers;
+
     console.dir(this);
 }); // Setdown
 

@@ -5,8 +5,8 @@
 var express = require('express'),
 	crypto  = require('crypto'),
 	path = require('path'),
-	nowjs = require('now'),
-	daf  = require('../node/dumpDaF.js');
+	daf  = require('../node/dumpDaF.js'),
+	v8p = require("v8-profiler");
 
 var app = module.exports = express.createServer();
 
@@ -54,6 +54,7 @@ function md5(str) {
 var users = {
 	cryptix: {
 		name: 'cryptix',
+		home: '/Users/cryptix',
 		salt: 'aud12h8asdxzncbsadj129asjdj028192898',
 		pass: md5('foobar' + 'aud12h8asdxzncbsadj129asjdj028192898')
 	}
@@ -89,11 +90,9 @@ app.get('/', function(req, res) {
 
 app.get('/login', function(req, res) {
 	if(req.session.user) {
-		/*
 		req.session.success = 'Authenticated as ' + req.session.user.name
 					+ ' click to <a href="/logout">Logout</a>. '
 					+ ' You may now access <a href="/files">/files</a>';
-		*/
 		res.redirect('/files');
 	} else {
 		res.render('login');
@@ -126,54 +125,49 @@ app.get('/logout', function(req, res) {
  * files
  */
 app.get('/files', restrict, function(req, res) {
+	if(typeof req.session.cwd === 'undefined') {
+		req.session.cwd = req.session.user.home
+	};
 	res.render('files', {
-		user: req.session.user.name
+		user: req.session.user.name,
+		cwd: req.session.cwd
 	});
 });
 
+app.post('/files/lsDir', restrict, function(req, res) {
+	var newd = req.body.newd;
+	if(newd === '..') {
+		newd = req.session.cwd.split('/').filter(function(e,i,a) { return i < a.length-1; } ).join('/');
+	} else {
+		newd = path.join(req.session.cwd,newd);
+	}
+	req.session.cwd = newd;
+	
+	daf.dirsAndFiles(newd, function(err, files, dirs){
+		if(err) { return console.log('no valid dir....' + newd); }
+		res.contentType('application/json');
+		
+		var pogo = JSON.stringify({
+			c: newd,
+			f: files,
+			d: dirs
+		});
+
+		res.send(pogo);
+	});
+});
+
+app.post('/files/getFile', restrict, function(req, res) {
+	daf.getFile(path.join(req.session.cwd, req.body.fname), function(err, obj) {
+		if(err) { return console.log('file error' + err); }
+		var pogo = JSON.stringify(obj);
+		
+		res.send(pogo);
+	});
+});
 
 // Only listen on $ node app.js
 if (!module.parent) {
-	app.listen(8081, '85.25.11.45');
+	app.listen(3000);
 	console.log("Express server listening on port %d", app.address().port);
 }
-
-/*
- * now
- */
-var everyone = nowjs.initialize(app);
-
-everyone.connected(function() {
-	this.now.cwd = "/home/cryptix";
-    console.log("Setup");
-
-    console.dir(this);
-	// console.log("Setup");
-    // console.dir(this);
-}); 
-
-everyone.disconnected(function() {
-    // console.log("Setdown");
-    // console.dir(this);
-});
-
-everyone.now.lsDir = function(dir) {
-	var newd;
-	if(dir === '..') {
-		newd = this.now.cwd.split('/').filter(function(e,i,a) { return i < a.length-1; } ).join('/');
-	} else {
-		newd = path.join(this.now.cwd,dir);
-	}
-	daf.dirsAndFiles(newd, function(err, files, dirs){
-		if(err) { return console.log('no valid dir....' + err); }
-		everyone.now.render(files, dirs, newd);
-	});
-};
-
-
-everyone.now.getFile = function(fname, cb) {
-	daf.getFile(path.join(this.now.cwd, fname), function(err, obj) {
-		if(err) { return console.log('file error' + err); }
-		everyone.now.showFile(obj);
-	});
-};

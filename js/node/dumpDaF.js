@@ -36,13 +36,22 @@ exports.getFile = function(path, cb) {
 		mime: mime.lookup(path)
 	};
 	fs.readFile(path, function(err, buf) {
-		if (err) cb(err, null);
+		if (err) {
+			err.path = path;
+			cb(err, null);
+		}
 		switch (obj.mime) {
+			case 'image/gif':
 			case 'image/jpeg':
 			case 'image/png':
 				obj.b64 = buf.toString('base64');
 				break;
+			case 'text/html':
+			case 'text/plain':
+			case 'text/x-c':
+			case 'application/javascript':
 			case 'application/octet-stream':
+			case 'application/x-sh':
 				obj.str = buf.toString('utf8');
 				break;
 		}

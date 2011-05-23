@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+		<title>ReplaceMe</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="http://documentcloud.github.com/underscore/underscore-min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://github.com/michael/data/raw/v0.3.0/data.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" charset="utf-8">
+	    	$(document).ready(function() {
+	    		
+				var new1 = new Data.Hash({x: 123, y: 238, z: 999});
+					
+				new1.each(function(val, key, index) {
+					$('#world').append('<li>' + key + ': ' + val + '</li>')
+				});
+	    	});
+		</script>
+	</head>
+	<body>
+		<h1>Demo</h1>
+		<ul id="world">
+		</ul>
+	</body>
+</html>

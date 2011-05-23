@@ -41,6 +41,7 @@ exports.getFile = function(path, cb) {
 			cb(err, null);
 		}
 		switch (obj.mime) {
+			case 'image/gif':
 			case 'image/jpeg':
 			case 'image/png':
 				obj.b64 = buf.toString('base64');

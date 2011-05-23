@@ -11,7 +11,6 @@ html
           now.name = prompt("What's your name?", "");
           now.getMsg = function(name, msg) {
             $('#messages').append('<li>' + name + ': ' + msg + '</li>');
-            alert(now.users);
           }
         });
         $('#send-msg').click(function() {

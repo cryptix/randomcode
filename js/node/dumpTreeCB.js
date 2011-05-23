@@ -34,7 +34,7 @@ if (!module.parent) {
 		console.log("\n\n" + tree.leaves.length + " leaves  of " + tree.name);
 		tree.leaves.sort();
 		for(var i in tree.leaves) {
-			console.dir(tree.leaves[i]);
+			if(tree.leaves.hasOwnProperty(i)) console.dir(tree.leaves[i]);
 		}
 
 		console.log("\n\n parents  of " + tree.name);

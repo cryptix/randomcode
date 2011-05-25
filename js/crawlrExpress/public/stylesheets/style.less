@@ -1,76 +1,94 @@
-@white:#eeeeec;@black:#2e3436;@brown:#C60;@dark:#521;@dull:#643;@red:#c00;@green:#8ae234;@blue:#729fcf;@border:3px solid lightgrey;a {
-color: #00B7FF;
-}
-.error {
-color: @red;
-}
-html,body {
-color: @black;
-background: @white;
+@white:#eeeeec;
+@black:#2e3436;
 
-margin: 0 auto;
-width: 80%;
-font: 14px "Lucida Grande",Helvetica,Arial,sans-serif;
+@red:#c00;
+@green:#8ae234;
+@blue:#729fcf;
+
+@brown:#C60;
+@dark:#521;
+@dull:#643;
+
+@border:3px solid lightgrey;
+
+a {
+	color: #00B7FF;
+}
+
+.error {
+	color: @red;
+}
+
+html,body {
+	color: @black;
+	background: @white;
+
+	margin: 0 auto;
+	width: 80%;
+	font: 14px "Lucida Grande",Helvetica,Arial,sans-serif;
 }
 .selected {
-background-color: @dull;
+	background-color: @dull;
 }
 #wrap {
-background-color: #fff;
-min-width: 1000px;
-position: relative;
-clear: both;
-float: left;
+	background-color: #fff;
+	min-width: 1000px;
+	position: relative;
+	clear: both;
+	float: left;
 }
+
 #head {
-clear: both;
-float: left;
-width: 100%;
-background: @blue;
-border-bottom: @border;
+	clear: both;
+	float: left;
+	width: 100%;
+	background: @blue;
+	border-bottom: @border;
+	div {
+		float: right;
+	}
+	ul#cwd {
+		margin-left: 0;
+		padding-left: 0;
+		white-space: nowrap;
+	}
+	#cwd li {
+		display: inline;
+		list-style-type: none;
+		padding-right: 20px;
+	}
 }
-#head form {
-float: left;
-}
-#head div {
-float: right;
-}
-ul#cwd {
-margin-left: 0;
-padding-left: 0;
-white-space: nowrap;
-}
-#cwd li {
-display: inline;
-list-style-type: none;
-padding-right: 20px;
-}
+
+
+
 #tree {
-background-color: #fff;
-float: left;
-position: relative;
-width: 17%;
-margin-left: 2%;
-border-right: @border;
+	background-color: #fff;
+	float: left;
+	position: relative;
+	width: 17%;
+	margin-left: 2%;
+	border-right: @border;
+	ul li:hover {
+		background-color: @green;
+	}
 }
-#tree ul li:hover {
-background-color: @green;
-}
+
 #files {
-margin-left: 2%;
-background: #fff;
-float: left;
-width: 75%;
+	margin-left: 2%;
+	background: #fff;
+	float: left;
+	width: 75%;
+	table {
+		width: 100%;
+	}
+	table tbody tr:hover {
+		background-color: @green;
+	}
 }
-#files table {
-width: 100%;
-}
-#files table tbody tr:hover {
-background-color: @green;
-}
+
 #footer {
-background: @blue;
-padding: 5px 3% 5px 3%;
-clear: both;
-width: 94%;
+	background: @blue;
+	padding: 5px 3% 5px 3%;
+	clear: both;
+	width: 94%;
 }

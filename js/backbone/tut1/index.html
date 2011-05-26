@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Movies App</title>
+    <!-- libs -->
+    <script src='http://code.jquery.com/jquery-1.6.1.min.js'></script>
+    <script src='libs/underscore.js'></script>
+    <script src='libs/backbone.js'></script>
+
+    <!-- client templating -->
+    <script src='https://github.com/janl/mustache.js/raw/master/mustache.js'></script>
+
+    <!-- my app -->
+    <script src='MovieModel.js'></script>
+    <script src='MovieLibrary.js'></script>
+    <script src='MovieView.js'></script>
+    <script src='MovieAppModel.js'></script>
+    <script src='MovieAppView.js'></script>
+    <script src='MovieAppController.js'></script>
+
+
+    <!-- GO -->
+    <script type='text/javascript'>
+      $(document).ready(function () {
+          var movieApp = new MovieAppController({append_at: $('body')});
+          window.app = movieApp;
+          Backbone.history.start();
+      });
+    </script>
+  </head>
+  <body></body>
+</html>

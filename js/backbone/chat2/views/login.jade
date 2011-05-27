@@ -1,0 +1,21 @@
+!!! 5
+html(lang="en")
+  head
+    title nodechat login
+  body
+    #heading
+      h1 nodechat login
+    #content
+      p
+        | Please login or go
+        a(href='/signup') here
+        | to create a new account
+      form(method='post', action='/login')
+        p
+          label Username:
+            input(type='text', name='username')
+        p
+          label Password:
+            input(type='password', name='password')
+        p 
+          input(type='submit', value='send')

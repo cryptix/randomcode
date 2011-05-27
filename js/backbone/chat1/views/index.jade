@@ -5,22 +5,28 @@ html(lang='en')
     script(type='text/javascript', src='/lib/jquery.min.js')
     script(type='text/javascript', src='/lib/underscore.js')
     script(type='text/javascript', src='/lib/backbone.js')
-    script(type='text/javascript', src='/lib/socket.io.js')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
     script(type='text/javascript', src='/models/models.js')
     script(type='text/javascript', src='/controllers/controllers.js')
     script(type='text/javascript', src='/views/views.js')
+    script(type='text/javascript')
+      $(document).ready(function () {
+        var chatApp = AppChatController.init();
+        window.app = chatApp;
+        //Backbone.history.start();
+      });
   body
     #heading
       h1 nodechat
     #content
-      p
+      p 
         | connected clients
         span#client_count 0
       p
         | Fun Chat Messages
         ul#chat_list
-
-      form(method='post', action='#', onsubmit='return false')#messageForm
+        
+      form(method="post", action="#", onsubmit="return false")#messageForm
         p
           label Name:
             input(type='text', name='user_name')
@@ -28,5 +34,6 @@ html(lang='en')
           label Message:
             input(type='text', name='message')
             input(type='submit', value='send')
+
     #footer
       p cryptix 2011

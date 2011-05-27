@@ -1,8 +1,6 @@
 (function () {
-  var server = false,
-      models;
-
-  if(typeof exports !== 'undefined') {
+  var server = false, models;
+  if (typeof exports !== 'undefined') {
     _ = require('underscore')._;
     Backbone = require('backbone');
 
@@ -24,18 +22,17 @@
     }
   });
 
-  models.NodeChatModel = Backbone.Model.extend({
+  models.ChatCollection = Backbone.Collection.extend({
+    model: models.ChatEntry
+  });
+
+  models.AppChatModel = Backbone.Model.extend({
     defaults: {
       "clientId": 0
     },
-
     initialize: function() {
       this.chats = new models.ChatCollection();
     }
-  });
-
-  models.ChatCollection = Backbone.Collection.extend({
-    model: models.ChatEntry
   });
 
   Backbone.Model.prototype.xport = function (opt) {
@@ -79,7 +76,7 @@
       if (data.collections) {
         _.each(data.collections, function(collection, name) {
           targetObj[name].id = collection.id;
-          _.each(collection.models, function(modelData, index) {
+          _.each(collection.models, function(modelData) {
             var newObj = targetObj[name]._add({}, {silent: silent});
             process(newObj, modelData);
           });
@@ -98,4 +95,3 @@
     return this;
   };
 }());
-

@@ -5,6 +5,8 @@ html(lang="en")
   body
     #heading
       h1 nodechat login
+      - if (message)
+        div.message!=message
     #content
       p
         | Please login or go

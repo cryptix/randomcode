@@ -20,11 +20,33 @@ var express = require('express'),
     socket = require('socket.io').listen(app),
     RedisStore = require('connect-redis');
 
-app.set('view engine', 'jade');
-app.set('view options', {layout: false});
-app.use(express.bodyParser());
-app.use(express.cookieParser());
-app.use(express.session({ store: new RedisStore(), secret: 'I loooveee PooOOonniiieees' }));
+app.configure(function () {
+  app.set('view engine', 'jade');
+  app.set('view options', {layout: false});
+  app.use(express.bodyParser());
+  app.use(express.cookieParser());
+  app.use(express.session({ store: new RedisStore(), secret: 'I loooveee PooOOonniiieees' }));
+});
+
+app.configure('development', function(){
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+});
+
+app.configure('production', function(){
+  app.use(express.errorHandler());
+});
+
+// message helper
+app.dynamicHelpers({
+  message: function(req) {
+    var err = req.session.error,
+        msg = req.session.success;
+    delete req.session.error;
+    delete req.session.success;
+    if(err) { return '<p class="error">' + err + '</p>'; }
+    if(msg) { return '<p class="success">' + msg + '</p>'; }
+  }
+});
 
 app.get('/*.(js|css)', function (req, res) {
   res.sendfile('./' + req.url);
@@ -45,6 +67,7 @@ app.post('/login', function (req, res) {
         res.redirect('/');
       });
     } else {
+      console.dir(err);
       req.session.error = 'Authentication failed, please check your username and password.';
       res.redirect('back');
     }

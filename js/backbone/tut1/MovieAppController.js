@@ -10,7 +10,7 @@ var MovieAppController = Backbone.Controller.extend({
       'movies/remove/:number': 'remove'
   },
   add: function () {
-    app.model.movies.add(new Movie({
+    this.model.movies.add(new Movie({
         title: 'The Matrix ' + Math.floor(Math.random()*11),
         format: 'dvd'
       })
@@ -19,6 +19,6 @@ var MovieAppController = Backbone.Controller.extend({
     this.saveLocation();
   },
   remove: function (cid) {
-    app.model.movies.remove(app.model.movies.getByCid(cid));
+    this.model.movies.remove(this.model.movies.getByCid(cid));
   }
 });

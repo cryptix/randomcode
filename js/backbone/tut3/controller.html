@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Controllers</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore.js"></script>
+    <script src="http://documentcloud.github.com/backbone/backbone.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    var AppController = Backbone.Controller.extend({
+      routes: {
+        'say/:something' : 'say'
+      },
+
+      say: function(something) {
+        console.warn(something);
+      }
+    });
+
+    $(document).ready(function() {
+      var yC = new AppController;
+
+      Backbone.history.start();
+    });
+    </script>
+  </head>
+  <body>
+    <h1>Demo</h1>
+    <a href='#say/wannaB'>Hi</a>
+  </body>
+</html>

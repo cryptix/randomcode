@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Collections</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+    <script src="http://documentcloud.github.com/underscore/underscore.js"></script>
+    <script src="http://documentcloud.github.com/backbone/backbone.js"></script>
+    <script src="https://raw.github.com/jeromegn/Backbone.localStorage/master/backbone.localStorage-min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+    var Donut = Backbone.Model.extend({});
+
+    var Donuts = Backbone.Collection.extend({
+      model: Donut,
+      localStorage: new Store('DonutShop')
+    });
+
+    var DonutView = Backbone.View.extend({
+      tagName: 'li',
+      className: 'donut',
+
+      render: function() {
+        this.el.innerHTML = this.model.get('name');
+
+        return this;
+      }
+    });
+
+    var DonutViewWithUpdating = DonutView.extend({
+      initialize: function(opts) {
+        this.render = _.bind(this.render, this);
+
+        this.model.bind('change:name', this.render);
+      }
+    });
+
+    var DonutsViewWithUpdating = Backbone.View.extend({
+      initialize: function(options) {
+        _(this).bindAll('add', 'remove');
+
+        if (!options.childViewConstructor) throw 'No child view constructor provided';
+        if (!options.childViewTagName) throw 'No child view tag name provided';
+
+        this._childViewConstructor = options.childViewConstructor;
+        this._childViewTagname = options.childViewTagName;
+
+        this._childViews = [];
+
+        this.collection.each(this.add);
+
+        this.collection.bind('add', this.add);
+        this.collection.bind('remove', this.remove);
+      },
+      add: function (model) {
+        var childView = new this._childViewConstructor({
+          tagName: this._childViewTagname,
+          model: model
+        });
+
+        this._childViews.push(childView);
+
+        if (this._rendered) {
+          $(this.el).append(childView.render().el);
+        }
+      },
+      remove: function(model) {
+        var viewToRemove = _(this._childViews).select(function(cv) { return cv.model === model; })[0];
+        this._childViews = _(this._childViews).without(viewToRemove);
+
+        if (this._rendered) $(viewToRemove.el).remove();
+      },
+      render: function() {
+        var that = this;
+        this._rendered = true;
+
+        $(this.el).empty();
+
+        _(this._childViews).each(function(cv) {
+          $(that.el).append(cv.render().el);
+        });
+
+        return this;
+      }
+    });
+    
+    var donuts; // plaything to leak the collection to the console
+    $(document).ready(function() {
+      var init = [ {'name': 'Boston Cream'}, {'name': 'Lemon-Filled'}, {'name': 'Rusty Iron Shavings'} ];
+      donuts = new Donuts();
+      donuts.fetch();
+
+      if(donuts.length === 0) {
+        _(init).forEach(function(d) {
+          donuts.create(d);
+        });
+      }
+      var donutsView = new DonutsViewWithUpdating({
+        collection: donuts,
+        childViewConstructor: DonutViewWithUpdating,
+        childViewTagName: 'li',
+        el: $('ul#dList')[0]
+      });
+
+      donutsView.render();
+
+      /*
+      setTimeout(function() { donuts.at(0).set({name: 'Booston Cream!'}); }, 2000);
+      setTimeout(function() { donuts.at(1).set({name: 'Lem0n-Ra1n!'}); }, 1600);
+      setTimeout(function() { donuts.at(2).set({name: 'Chocolate PudPudd'}); }, 1200);
+      */
+    });
+    </script>
+  </head>
+  <body>
+    <h1>Demo</h1>
+    <ul id='dList'>
+    </ul>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv='Content-type' content='text/html; charset=utf-8'>
+    <title>Spine Layout Demo - List</title>
+    <style type='text/css' media='screen'>
+#sidebar {
+  list-style: none;
+  margin:0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#sidebar li {
+  float: left;
+  padding: 5px 10px;
+}
+
+#sidebar li.active {
+  border: 1px solid #000;
+}
+    </style>
+
+    <script type='text/x-template' charset='utf-8' id='contacts-template'>
+      <li class='item'>${name}</li>
+    </script>
+
+    <script type='text/x-template' charset='utf-8' id='contact-template'>
+      <p>${name}</p>
+    </script>
+  </head>
+
+  <!-- Body -->
+  <body>
+    <div id='layout2'>
+      <h1>List Demo</h1>
+
+      <ul id='sidebar'>
+      </ul>
+
+      <div id='main'>
+      </div>
+    </div>
+
+  <!-- Load scripts -->
+    <script type='text/javascript' charset='utf-8' src='http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/spine.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/lib/spine.tmpl.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/lib/spine.list.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/lib/spine.local.js'></script>
+    <script type='text/javascript' charset='utf-8' src='list.js'></script>
+
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv='Content-type' content='text/html; charset=utf-8'>
+    <title>Spine Pattern Demo</title>
+
+    <!-- Templates -->
+    <script type='text/x-template' charset='utf-8' id='contacts-template'>
+        <li class='item'>${firstname}, ${lastname} <a href='#' class='remove'>X</a></li>
+    </script>
+  </head>
+
+  <!-- Body -->
+<div id='layout3'>
+    <h1>Spine Patterns</h1>
+    
+    <h2>Add Contact</h2>
+    <form action='#' method='post' id='contactForm'>
+        <p>
+            <label for='firstname'>Firstname:</label>
+            <input type='text' name='firstname'>
+        </p>
+        <p>
+            <label for='lastname'>Lastname:</label>
+            <input type='text' name='lastname'>
+        </p>
+        <input type='submit' value='Add'>
+    </form>
+    
+    <h2>Contacts</h2>
+    <ul id='contacts'>
+    </ul>
+  </div>
+  <!-- Load scripts -->
+    <script type='text/javascript' charset='utf-8' src='http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/spine.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/lib/spine.tmpl.js'></script>
+    <script type='text/javascript' charset='utf-8' src='patterns.js'></script>
+
+  </body>
+</html>

@@ -1,5 +1,4 @@
 var fs = require('fs'),
-    util = require('util'),
     path = require('path'),
     http=require('http'),
     url=require('url'),
@@ -33,7 +32,7 @@ jsdom.env(boardUrl,
           var file = fs.createWriteStream(path.join(threadNum,fname));
           
           if(res.statusCode === 200) {
-            util.pump(res, file);
+            res.pipe(file);
           }
           
           res.on('end', function() {

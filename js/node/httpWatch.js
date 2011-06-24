@@ -1,24 +1,26 @@
 var http = require('http'),
-	fs = require('fs');
+      fs = require('fs');
 
 var fname = process.ARGV[2]
+if(!fname) return console.log('usage: node %s fname', process.ARGV[1]);
 
 s = http.createServer(function (req, res) {
-		res.writeHead(200, {'Content-Type': 'text/plain'});
+  var changesCount = 5;
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
 
-		res.write("hi");
-		fs.watchFile(fname, function(curr, prev) {
-				res.write('the current mtime is: ' + curr.mtime);
-				res.write('the previous mtime was: ' + prev.mtime);
-		});
+  res.write('hi, watching: ' + fname + '\n');
 
-		setTimeout(function() {
-			res.end("bye");
-		}, 2000);
+  fs.watchFile(fname, function(curr, prev) {
+    res.write('\nthe previous size was: ' + prev.size);
+    res.write('\nthe current size is: ' + curr.size);
 
+    changesCount -= 1;
+    console.log('changes left:' + changesCount);
+    if(changesCount === 0) res.end('\n\nBye');
+  });
 });
 
 
-s.listen(8124, "127.0.0.1");
+s.listen(3000);
 
-console.log('watching Server running at http://127.0.0.1:8124/');
+console.log('http watch server running');

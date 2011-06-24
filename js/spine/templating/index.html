@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Spine Templating</title>
+    <style type='text/javascript'>
+    </style>
+    <script type='text/javascript' charset='utf-8' src='http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/spine.js'></script>
+    <script type='text/javascript' charset='utf-8' src='https://raw.github.com/maccman/spine/master/lib/spine.tmpl.js'></script>
+    <script type='text/javascript' charset='utf-8'>
+      // jQuery template loader
+      (function($) {
+        var srcToName = function(name) {
+          return name
+            .replace(/\.\w+?$/, '')
+            .replace(/(\/|_)/, '-');
+        };
+        
+        var appendTemplate = function(src, html) {
+          var template = $('<script />');
+          
+          template.attr({
+            type: 'text/x-template',
+            id: srcToName(src) + '-template'
+          });
+          
+          template.html(html);
+          $('head').append(template);
+        };
+        
+        $.loadTemplate = function(src, name) {
+          $.get(src)
+            .success(function(result) {
+              appendTemplate(name || src, result);
+            });
+          return this;
+        };
+      })(jQuery);
+      
+      // Go
+      $(document).ready(function() {
+        $.loadTemplate('http://192.168.2.122:8080/files.tmpl', 'files');
+        
+        // inline templates
+        (function one() {
+          var object = {
+            url: 'http://example.com',
+            getName: function() { return 'James'; }
+          };
+          
+          var template = '<li><a href="${url}">${getName()}</a></li>';
+          
+          var element = $.tmpl(template, object);
+          $('#one').append(element);
+        })();
+        
+        // inline templates with flow control
+        (function two() {
+          var object = {
+            foo: 'bar',
+            messages: ['Hi there', 'foo bar', 'eat something', 'teach something']
+          };
+          
+          var template = '\
+              {{each messages}}\
+                <li value="${$index + 2}"><em>${$value}</em></li>\
+              {{/each}}';
+          
+          var element = $.tmpl(template, object);
+          $('#two').append(element);
+        })();
+        
+        // templates inside custom <script>
+        (function three() {
+          var object = {
+            name: 'Hans Frans',
+            descr: 'Public figure with a lot of meh.',
+            tel: '0172871392',
+            fax: '01728713923',
+            email: 'hans@frans.net'
+          };
+          
+          var template = $('#contact-template').html();
+          
+          var elem = $.tmpl(template, object);
+          $('#three').append(elem);
+        })();
+        
+        (function four() {
+          var object = {
+            name: 'testfile.txt',
+            size: 23817,
+            mtime: 'yesterday'
+          };
+          
+          
+          
+          var template = $('#files-template').html();
+          var elem = $.tmpl(template, object);
+          
+          $('#tbody').append(elem);
+        });
+        
+      });
+    </script>
+    
+    <script type='text/template' charset='utf-8' id='contact-template'>
+      <h3>${name}</h3>
+      <p>${descr}</p>
+      <ul>
+        <li>Tel: ${tel}</li>
+        <li>Fax: ${fax}</li>
+        <li><a href="mailto:${email}">Email</a></li>
+      </ul>
+    </script>
+  </head>
+  <body>
+    <div id='wrap'>
+      <h1>Spine Templating</h1>
+      
+      <h2>Simple Interpolation</h2>
+      <div id='one'>
+      </div>
+
+      <h2>Flow control</h2>
+      <ol id='two'>
+      </ol>
+      
+      <h2>Template in script</h2>
+      <div id='three'>
+      </div>
+      
+      <h2>Remote Templates</h2>
+      <h3>Files</h3>
+      <table>
+        <thead>
+          <td>Name</td>
+          <td>Size</td>
+          <td>Mtime</td>
+        </thead>
+        <tbody id='tbody'>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

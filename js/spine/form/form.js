@@ -16,7 +16,7 @@ Contact.include({
 });
 
 Contact.bind("error", function(rec, msg) {
-    alert("Contact failed to save - " + msg);
+    rec.controller.trigger('validateError', msg);
 });
 
 var Contacts = Spine.Controller.create({
@@ -26,15 +26,24 @@ var Contacts = Spine.Controller.create({
     events: {
         "submit form#contactForm": "create"
     },
+    init: function() {
+      this.bind('validateError', this.error);
+    },
 
     create: function(e) {
         e.preventDefault();
         var data = this.form.serializeForm();
+        data.controller = this;
         var user = Contact.create(data);
         if (user) alert('Hi, ' + user.firstname + ' ' + user.lastname);
+    },
+
+    error: function(msg) {
+      $('#validate').append($('<li></li>').text("Contact failed to save - " + msg));
     }
 });
 
 Contacts.init({
     el: $("body")
 });
+

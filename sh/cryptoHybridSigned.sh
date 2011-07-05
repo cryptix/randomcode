@@ -8,39 +8,43 @@ dPub=Device.public.pem      # lives at Company HQ
 
 function encANDsend {
     blob=$1
+    wdir=$(openssl rand -hex 12)
     
+    mkdir $wdir && cd $wdir
+
     echo "# 1. come up with SKey"
-    openssl rand -out skey 240
+    openssl rand -out skey.clear 240
     
     echo '# 2. encrypt blob with AES using SKey'
-    openssl enc -aes-256-cbc -e -salt -in $blob -out blob.ciphered -kfile skey
+    openssl enc -aes-256-cbc -e -salt -in ../$blob -out blob -kfile skey.clear
     
     echo '# 3. encrypt skey with RSA using the device public key'
-    openssl rsautl -encrypt -pubin -inkey $dPub -in skey -out skey.ciphered
+    openssl rsautl -encrypt -pubin -inkey ../$dPub -in skey.clear -out skey
     
     echo '# 4. sign both ciphered files'
-    openssl dgst -sha1 -sign $cPriv -out skey.sig skey.ciphered
-    openssl dgst -sha1 -sign $cPriv -out blob.sig blob.ciphered
+    openssl dgst -sha1 -sign ../$cPriv -out skey.sig skey
+    openssl dgst -sha1 -sign ../$cPriv -out blob.sig blob
 
     echo '# 5. pack up'
-    tar -cvf ${1}.tar blob.ciphered blob.sig skey.ciphered skey.sig
+    zip ${1}.zip blob blob.sig skey skey.sig
 
     echo '# housekeeping'
-    rm skey{,.ciphered,.sig}
-    rm blob{.ciphered,.sig}
+    mv ${1}.zip .. && cd ..
+    #rm -rf $wdir
 }
 
 function recvANDdec {
+    zipf=$1
+    fname=$(echo $zipf | sed 's/.zip//')
+
     wdir=$(openssl rand -hex 12)
-    tar=$1
     
     echo '# 1. unpacks a tar'
     mkdir $wdir && cd $wdir;
-    tar -xvf ../$tar
-    
+    unzip ../$zipf
     
     echo '# 2. expects these 4 files inside'
-    for f in blob.ciphered blob.sig skey.ciphered skey.sig
+    for f in blob blob.sig skey skey.sig
     do
         if test -f $f;
         then
@@ -53,15 +57,16 @@ function recvANDdec {
     done
     
     echo '# 3. check signatures against company.public.pem'
-    openssl dgst -sha1 -verify ../$cPub -signature blob.sig blob.ciphered || (echo 'Error - Blob didnt verify' && exit 2)
-    openssl dgst -sha1 -verify ../$cPub -signature skey.sig skey.ciphered || (echo 'Error - SKey didnt verify' && exit 2)
+    openssl dgst -sha1 -verify ../$cPub -signature blob.sig blob || (echo 'Error - Blob didnt verify' && exit 2)
+    openssl dgst -sha1 -verify ../$cPub -signature skey.sig skey || (echo 'Error - SKey didnt verify' && exit 2)
     
     echo '# 4. decrypt skey with cevice private key'
-    openssl rsautl -decrypt -inkey ../$dPriv -in skey.ciphered -out skey
+    openssl rsautl -decrypt -inkey ../$dPriv -in skey -out skey.clear
 
     echo '# 5. decrypt blob with skey'
-    openssl enc -aes-256-cbc -d -salt -in blob.ciphered -out blob -kfile skey
+    openssl enc -aes-256-cbc -d -salt -in blob -out $fname -kfile skey.clear
     
-    echo '# exit wdir'
-    cd ..
+    echo '# housekeeping'
+    mv $fname .. && cd ..
+    #rm -rf $wdir
 }

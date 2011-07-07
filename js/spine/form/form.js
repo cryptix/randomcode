@@ -10,14 +10,15 @@ $.fn.serializeForm = function() {
 var Contact = Spine.Model.setup('Contact', ['firstname', 'lastname']);
 Contact.include({
     validate: function() {
-        if (!this.firstname) return "First name is required";
-        if (!this.lastname) return "Last name is required";
+        if (!this.firstname) return {msg: "First name is required", field: 'firstname'};
+        if (!this.lastname) return {msg: "Last name is required", field: 'lastname'};
     }
 });
 
+/*
 Contact.bind("error", function(rec, msg) {
-    rec.controller.trigger('validateError', msg);
 });
+*/
 
 var Contacts = Spine.Controller.create({
     elements: {
@@ -27,23 +28,20 @@ var Contacts = Spine.Controller.create({
         "submit form#contactForm": "create"
     },
     init: function() {
-      this.bind('validateError', this.error);
     },
 
     create: function(e) {
         e.preventDefault();
         var data = this.form.serializeForm();
-        data.controller = this;
-        var user = Contact.create(data);
-        if (user) alert('Hi, ' + user.firstname + ' ' + user.lastname);
-    },
-
-    error: function(msg) {
-      $('#validate').append($('<li></li>').text("Contact failed to save - " + msg));
+        var user = Contact.init(data);
+        var err = user.validate();
+        if (typeof err === 'undefined') {
+          console.log('Hi, ' + user.firstname + ' ' + user.lastname);
+        } else {
+          console.log('err: ' + err.msg);
+          $('input[name=' + err.field + ']').focus();
+        }
     }
 });
 
-Contacts.init({
-    el: $("body")
-});
-
+Contacts.init({ el: $("body") });

@@ -29,10 +29,19 @@
           $('head').append(template);
         };
 
-        $.loadTemplate = function(src, name) {
+        $.loadTemplate = function(src, name, cb) {
           $.get(src)
-            .success(function(result) {
-              appendTemplate(name || src, result);
+            .success(function(html) {
+              var template = $('<script />');
+
+              template.attr({
+                type: 'text/x-template',
+                id: srcToName(name || src) + '-template'
+              });
+
+              template.html(html);
+              $('head').append(template);
+              cb();
             });
           return this;
         };
@@ -40,8 +49,6 @@
 
       // Go
       $(document).ready(function() {
-        //$.loadTemplate('http://192.168.2.122:8080/files.tmpl', 'files');
-
         // inline templates
         (function one() {
           var object = {
@@ -72,7 +79,7 @@
         })();
 
         // templates inside custom <script>
-        (function three() {
+        function three() {
           var object = {
             name: 'Hans Frans',
             descr: 'Public figure with a lot of meh.',
@@ -85,7 +92,8 @@
 
           var elem = $.tmpl(template, object);
           $('#three').append(elem);
-        })();
+        };
+        $.loadTemplate('http://localhost/contact.tmpl', 'contact', three);
 
         function four() {
           var object = {
@@ -99,11 +107,12 @@
 
           $('#tbody').append(elem);
         };
-        setTimeout(four, 1000); // wait for template to be loaded. callbacks would be nicer..
+        $.loadTemplate('http://localhost/files.tmpl', 'files', four);
 
       });
     </script>
 
+    <!-- template inside custom <script>
     <script type='text/x-template' charset='utf-8' id='contact-template'>
       <h3>${name}</h3>
       <p>${descr}</p>
@@ -113,6 +122,7 @@
         <li><a href="mailto:${email}">Email</a></li>
       </ul>
     </script>
+    -->
   </head>
   <body>
     <div id='wrap'>

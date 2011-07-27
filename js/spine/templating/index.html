@@ -16,7 +16,19 @@
             .replace(/\.\w+?$/, '')
             .replace(/(\/|_)/, '-');
         };
-        
+
+        var appendTemplate = function(src, html) {
+          var template = $('<script />');
+
+          template.attr({
+            type: 'text/x-template',
+            id: srcToName(src) + '-template'
+          });
+
+          template.html(html);
+          $('head').append(template);
+        };
+
         $.loadTemplate = function(src, name, cb) {
           $.get(src)
             .success(function(html) {
@@ -34,7 +46,7 @@
           return this;
         };
       })(jQuery);
-      
+
       // Go
       $(document).ready(function() {
         // inline templates
@@ -43,29 +55,30 @@
             url: 'http://example.com',
             getName: function() { return 'James'; }
           };
-          
+
           var template = '<li><a href="${url}">${getName()}</a></li>';
-          
+
           var element = $.tmpl(template, object);
           $('#one').append(element);
         })();
-        
+
         // inline templates with flow control
         (function two() {
           var object = {
             foo: 'bar',
             messages: ['Hi there', 'foo bar', 'eat something', 'teach something']
           };
-          
+
           var template = '\
               {{each messages}}\
                 <li value="${$index + 2}"><em>${$value}</em></li>\
               {{/each}}';
-          
+
           var element = $.tmpl(template, object);
           $('#two').append(element);
         })();
-        
+
+        // templates inside custom <script>
         function three() {
           var object = {
             name: 'Hans Frans',
@@ -74,31 +87,31 @@
             fax: '01728713923',
             email: 'hans@frans.net'
           };
-          
+
           var template = $('#contact-template').html();
-          
+
           var elem = $.tmpl(template, object);
           $('#three').append(elem);
         };
         $.loadTemplate('http://localhost/contact.tmpl', 'contact', three);
-        
+
         function four() {
           var object = {
             name: 'testfile.txt',
             size: 23817,
             mtime: 'yesterday'
           };
-          
+
           var template = $('#files-template').html();
           var elem = $.tmpl(template, object);
-          
+
           $('#tbody').append(elem);
         };
         $.loadTemplate('http://localhost/files.tmpl', 'files', four);
-        
+
       });
     </script>
-    
+
     <!-- template inside custom <script>
     <script type='text/x-template' charset='utf-8' id='contact-template'>
       <h3>${name}</h3>
@@ -114,7 +127,7 @@
   <body>
     <div id='wrap'>
       <h1>Spine Templating</h1>
-      
+
       <h2>Simple Interpolation</h2>
       <div id='one'>
       </div>
@@ -122,11 +135,11 @@
       <h2>Flow control</h2>
       <ol id='two'>
       </ol>
-      
+
       <h2>Template in script</h2>
       <div id='three'>
       </div>
-      
+
       <h2>Remote Templates</h2>
       <h3>Files</h3>
       <table>

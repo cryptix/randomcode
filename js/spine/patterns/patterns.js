@@ -32,22 +32,22 @@ var ContactItem = Spine.Controller.create({
         this.item.bind('update', this.render);
         this.item.bind('destroy', this.remove);
     },
-    
+
     render: function(item) {
         if(item) this.item = item;
-        
+
         this.el.html(this.template(this.item));
         return this;
     },
-    
+
     template: function(items) {
         return $('#contacts-template').tmpl(items);
     },
-    
+
     remove: function() {
         this.el.remove();
     },
-    
+
     click: function() {
         console.log('clicked' + this.item.id);
     }
@@ -56,7 +56,7 @@ var ContactItem = Spine.Controller.create({
 // Item Controller
 var Contacts = Spine.Controller.create({
     proxied: ['addOne', 'addAll'],
-    
+
     init: function() {
         Contact.bind("refresh", this.addAll);
         Contact.bind("create", this.addOne);
@@ -65,7 +65,7 @@ var Contacts = Spine.Controller.create({
         "form#contactForm": "form",
         "ul#contacts": "list"
     },
-    
+
     events: {
         "submit form#contactForm": "create"
     },
@@ -75,12 +75,12 @@ var Contacts = Spine.Controller.create({
         var data = this.form.serializeForm();
         var user = Contact.create(data);
     },
-    
+
     addOne: function(item) {
         var user = ContactItem.init({item: item});
         this.list.append(user.render().el);
     },
-    
+
     addAll: function() {
         Contact.each(this.AddOne);
     }

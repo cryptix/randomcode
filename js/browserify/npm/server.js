@@ -4,7 +4,7 @@ var server = connect.createServer();
 server.use(connect.static(__dirname));
 server.use(require('browserify')({
     mount: '/browserify.js',
-    require: 'traverse'
+    require: ['traverse', 'spine', 'jquery-browserify']
 }));
 
 server.listen(3002);

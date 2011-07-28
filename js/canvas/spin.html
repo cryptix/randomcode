@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Rotate</title>
+    <style type='text/css'>
+      canvas { border: 1px solid black; }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+      var ctx = document.getElementById('spin').getContext('2d');
+
+
+      var x = 0;
+      var shift = 0;
+      var colShift = 1;
+      function draw() {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0,0,300,300);
+
+        ctx.save();
+
+        ctx.translate(150,150);
+        ctx.rotate(shift);
+
+        for (var i=1;i<10;i++){ // Loop through rings (from inside to out)
+          ctx.save();
+          ctx.fillStyle = 'rgb('+(colShift*i)+','+(255-colShift*i)+',255)';
+
+          for (var j=0;j<i*10;j++){ // draw individual dots
+            ctx.rotate(Math.PI*2/(i*6));
+            ctx.beginPath();
+            ctx.arc(0,i*12.5,5*colShift/33,0,Math.PI*2,true);
+            ctx.fill();
+          }
+
+          ctx.restore();
+        }
+
+        ctx.restore();
+
+        shift = Math.PI * Math.sin(x);
+        colShift = Math.floor(33*(Math.sin(x) + 1));
+        x += (Math.PI/100);
+
+        console.log('\n\nx: ' + x + '\nshift: ' + shift + '\ncolshift: ' + colShift);
+      }
+
+      setInterval(draw, 100);
+    });
+    </script>
+  </head>
+  <body>
+
+    <h1>Rotate Demo</h1>
+    <canvas id='spin' width='300' height='300'></canvas>
+  </body>
+</html>

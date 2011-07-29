@@ -138,17 +138,19 @@ var Audiogram = Spine.Controller.create({
     ctx.fillStyle = '#000';
 
 
-    ctx.save();
     // bg fade
+    ctx.save();
+    var fade = ctx.createLinearGradient(opt.boxWidth, 0, opt.boxWidth, opt.boxHeight);
+    fade.addColorStop(0, "#fff");
     if (this.active) {
-      var fade = ctx.createLinearGradient(opt.boxWidth, 0, opt.boxWidth, opt.boxHeight);
-      fade.addColorStop(0, "#fff");
       fade.addColorStop(1, this.settings.color);
-      ctx.fillStyle = fade;
-      ctx.fillRect(0, 0, opt.boxWidth, opt.boxHeight);
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(opt.plotXoff, opt.plotYoff, opt.plotWidth, opt.plotHeight);
+    } else {
+      fade.addColorStop(1, '#333');
     }
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, opt.boxWidth, opt.boxHeight);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(opt.plotXoff, opt.plotYoff, opt.plotWidth, opt.plotHeight);
     ctx.restore();
 
     // text
@@ -167,6 +169,7 @@ var Audiogram = Spine.Controller.create({
     // X Axis
     ctx.save();
     ctx.beginPath();
+    ctx.lineWidth=1;
     ctx.textAlign = 'left';
     ctx.font = '10pt Thahoma, mono';
     var hz = ['8k', '6k', '4k', '3k', '2k',
@@ -194,6 +197,12 @@ var Audiogram = Spine.Controller.create({
       ctx.fillText(hl, opt.plotXoff - 5,  y + 2, 20);
     }
     ctx.stroke();
+    ctx.restore();
+
+    // outline
+    ctx.lineWidth = 2;
+    ctx.strokeRect(opt.plotXoff, opt.plotYoff, opt.plotWidth, opt.plotHeight);
+
     ctx.restore();
   },
 

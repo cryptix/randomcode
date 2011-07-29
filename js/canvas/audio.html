@@ -5,17 +5,26 @@
     <title>AudiogrammFoo</title>
     <style type='text/css'>
       canvas { border: 1px solid black; }
+      .plot {
+        float: left;
+        margin-left: 1em;
+      }
     </style>
     <script src='http://maccman.github.com/spine/spine.min.js'></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script type="text/javascript" src='audiogram.js'></script>
   </head>
   <body>
+    <h1>Audiogarms</h1>
 
-    <h1>Demo</h1>
-    <p>Mouse Position: <span id='pos2'></span></p>
-    <p>Mouse Position: <span id='pos1'></span></p>
-    <canvas id='audio1' width='455' height='520'></canvas>
-    <canvas id='audio2' width='455' height='520'></canvas>
+    <div class='plot'>
+      <p>plot1: <span id='pos1'></span> </p>
+      <canvas id='audio1' width='455' height='520'></canvas>
+    </div>
+
+    <div class='plot'>
+      <p>plot2: <span id='pos2'></span></p>
+      <canvas id='audio2' width='455' height='520'></canvas>
+    </div>
   </body>
 </html>

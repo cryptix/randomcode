@@ -1,6 +1,9 @@
+if (!Function.prototype.bind) { (function () { var slice = Array.prototype.slice; Function.prototype.bind = function (thisObj) { var target = this; if (arguments.length > 1) { var args = slice.call(arguments, 1); return function () { var allArgs = args; if (arguments.length > 0) { allArgs = args.concat(slice.call(arguments)); } return target.apply(thisObj, allArgs); }; } return function () { if (arguments.length > 0) { return target.apply(thisObj, arguments); } return target.call(thisObj); }; }; }()); } 
+
 var Audiogram = Spine.Controller.create({
   events: {
-    'mousemove ': 'onMouseMove'
+    'mousemove ': 'onMouseMove',
+    'click': 'toggle'
   },
 
   init: function () {
@@ -21,24 +24,19 @@ var Audiogram = Spine.Controller.create({
 
     // set up events
     $(document).keydown(this.onKeyDown.bind(this));
-    $(document).keyup(this.onKeyUp.bind(this));
-//    $(document).keypress(this.onKeyPress.bind(this));
-
+    //$(document).keyup(this.onKeyUp.bind(this));
+    //$(document).keypress(this.onKeyPress.bind(this));
 
     this.stepsHZ = ["125", 'TODO', "250", 'TODO', "500", "750", "1k", "1.5k", "2k", "3k", "4k", "6k", "8k"];
     this.stepsHL = [-10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130];
-
     this.buildJumps();
 
     this.curHZ  = 4; // array indices
     this.curHL  = 1;
     this.curPos = this.jumps [this.stepsHZ[this.curHZ]] [this.stepsHL[this.curHL]];
-
-
-    this.drawBlank();
     this.drawCursor();
 
-
+    this.drawBlank();
     this.active = false;
   },
 
@@ -55,46 +53,49 @@ var Audiogram = Spine.Controller.create({
     this.pos.text('x: ' + evt.offsetX + ' y: ' + evt.offsetY);
   },
 
+  toggle: function (evt) {
+    this.active = !this.active;
+    this.drawBlank();
+    this.drawCursor();
+  },
+
   onKeyDown: function (evt) {
     var nxt;
-    if(!this.active) return;
-    switch(evt.keyCode) {
-      case 37: // left
-        console.log('left');
-        if (nxt = this.stepsHZ[this.curHZ - 1]) {
-          if(nxt === 'TODO') {
-            this.curHZ -= 2;
-          } else {
-            this.curHZ -= 1;
+    this.drawBlank();
+    if(this.active) {
+      switch(evt.keyCode) {
+        case 37: // left
+          if (nxt = this.stepsHZ[this.curHZ - 1]) {
+            if(nxt === 'TODO') {
+              this.curHZ -= 2;
+            } else {
+              this.curHZ -= 1;
+            }
           }
-        }
-        break;
-      case 39: // right
-        console.log('right');
-        if (nxt = this.stepsHZ[this.curHZ + 1]) {
-          if(nxt === 'TODO') {
-            this.curHZ += 2;
-          } else {
-            this.curHZ += 1;
+          break;
+        case 39: // right
+          if (nxt = this.stepsHZ[this.curHZ + 1]) {
+            if(nxt === 'TODO') {
+              this.curHZ += 2;
+            } else {
+              this.curHZ += 1;
+            }
           }
-        }
-        break;
-      case 38: // up
-        console.log('up');
-        if (typeof this.stepsHL[this.curHL - 1] !== 'undefined') {
-          this.curHL -= 1;
-        }
-        break;
-      case 40: // down
-        console.log('down');
-        if (typeof this.stepsHL[this.curHL + 1] !== 'undefined') {
-          this.curHL += 1;
-        }
-        break;
+          break;
+        case 38: // up
+          if (typeof this.stepsHL[this.curHL - 1] !== 'undefined') {
+            this.curHL -= 1;
+          }
+          break;
+        case 40: // down
+          if (typeof this.stepsHL[this.curHL + 1] !== 'undefined') {
+            this.curHL += 1;
+          }
+          break;
+      }
     }
 
     this.curPos = this.jumps [this.stepsHZ[this.curHZ]] [this.stepsHL[this.curHL]];
-    this.drawBlank();
     this.drawCursor();
   },
 
@@ -137,9 +138,22 @@ var Audiogram = Spine.Controller.create({
     ctx.fillStyle = '#000';
 
 
+    ctx.save();
+    // bg fade
+    if (this.active) {
+      var fade = ctx.createLinearGradient(opt.boxWidth, 0, opt.boxWidth, opt.boxHeight);
+      fade.addColorStop(0, "#fff");
+      fade.addColorStop(1, this.settings.color);
+      ctx.fillStyle = fade;
+      ctx.fillRect(0, 0, opt.boxWidth, opt.boxHeight);
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(opt.plotXoff, opt.plotYoff, opt.plotWidth, opt.plotHeight);
+    }
+    ctx.restore();
+
     // text
     ctx.font = '14pt Arial';
-    ctx.fillText(this.strings.title, opt.boxWidth/2-20, 20);
+    ctx.fillText(this.settings.title, opt.boxWidth/2-20, 20);
     ctx.font = '12pt Arial';
     ctx.fillText('Frequenz [Hz]', opt.boxWidth/2-50, 40);
     // rotate
@@ -149,11 +163,12 @@ var Audiogram = Spine.Controller.create({
     ctx.fillText('Hörverlust [HL]', 0, 0);
     ctx.restore();
 
+
     // X Axis
     ctx.save();
     ctx.beginPath();
     ctx.textAlign = 'left';
-    ctx.font = '8pt Thahoma, mono';
+    ctx.font = '10pt Thahoma, mono';
     var hz = ['8k', '6k', '4k', '3k', '2k',
         '1.5k', '1k', '750', '500', '250', '125'];
     for(var i = 0; i < opt.lines-1; i += 1 ) {
@@ -208,16 +223,18 @@ $(document).ready(function() {
   ag1 = Audiogram.init({
     el: $('#audio1'),
     pos: $('#pos1'),
-    strings: {
+    settings: {
       'title': 'Links',
+      'color': '#00f'
     }
   });
 
   ag2 = Audiogram.init({
     el: $('#audio2'),
     pos: $('#pos2'),
-    strings: {
-      'title': 'Rechts'
+    settings: {
+      'title': 'Rechts',
+      'color': '#f00'
     }
   });
 });

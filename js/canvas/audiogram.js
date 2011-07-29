@@ -27,17 +27,16 @@ var Audiogram = Spine.Controller.create({
     //$(document).keyup(this.onKeyUp.bind(this));
     //$(document).keypress(this.onKeyPress.bind(this));
 
+    // jump points
     this.stepsHZ = ["125", 'TODO', "250", 'TODO', "500", "750", "1k", "1.5k", "2k", "3k", "4k", "6k", "8k"];
     this.stepsHL = [-10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130];
     this.buildJumps();
-
     this.curHZ  = 4; // array indices
     this.curHL  = 1;
     this.curPos = this.jumps [this.stepsHZ[this.curHZ]] [this.stepsHL[this.curHL]];
-    this.drawCursor();
 
-    this.drawBlank();
     this.active = false;
+    this.draw();
   },
 
   onMouseMove: function (evt) {
@@ -55,15 +54,14 @@ var Audiogram = Spine.Controller.create({
 
   toggle: function (evt) {
     this.active = !this.active;
-    this.drawBlank();
-    this.drawCursor();
+    this.draw();
   },
 
   onKeyDown: function (evt) {
     var nxt;
-    this.drawBlank();
     if(this.active) {
       switch(evt.keyCode) {
+
         case 37: // left
           if (nxt = this.stepsHZ[this.curHZ - 1]) {
             if(nxt === 'TODO') {
@@ -73,6 +71,7 @@ var Audiogram = Spine.Controller.create({
             }
           }
           break;
+
         case 39: // right
           if (nxt = this.stepsHZ[this.curHZ + 1]) {
             if(nxt === 'TODO') {
@@ -82,11 +81,13 @@ var Audiogram = Spine.Controller.create({
             }
           }
           break;
+
         case 38: // up
           if (typeof this.stepsHL[this.curHL - 1] !== 'undefined') {
             this.curHL -= 1;
           }
           break;
+
         case 40: // down
           if (typeof this.stepsHL[this.curHL + 1] !== 'undefined') {
             this.curHL += 1;
@@ -96,7 +97,7 @@ var Audiogram = Spine.Controller.create({
     }
 
     this.curPos = this.jumps [this.stepsHZ[this.curHZ]] [this.stepsHL[this.curHL]];
-    this.drawCursor();
+    this.draw();
   },
 
   onKeyUp: function (evt) {
@@ -109,23 +110,26 @@ var Audiogram = Spine.Controller.create({
     var opt = this.options;
     var x, y, sub, arr = {};
 
+    // TODO: rewrite to use step arr?
     var hz = this.stepsHZ;
     // hz
     for(var i = 0;i < opt.lines - 1; i += 1 ) {
       if (i == 1 || i == 3) continue;
       x = opt.plotXoff + opt.step * i;
-
       // hloss
       sub = {};
       for(var j = 0, hl = -10; j <= opt.lines; j += 1, hl += 10) {
         y = opt.plotYoff + opt.step * j;
-
         sub[hl] = [x,y];
       }
       arr[hz[i]] = sub;
-
     }
     this.jumps = arr;
+  },
+
+  draw: function () {
+    this.drawBlank();
+    if(this.active) this.drawCursor();
   },
 
   drawBlank: function () {
@@ -136,7 +140,6 @@ var Audiogram = Spine.Controller.create({
     ctx.fillStyle = '#fff';
     ctx.fillRect(0,0, opt.boxWidth, opt.boxHeight);
     ctx.fillStyle = '#000';
-
 
     // bg fade
     ctx.save();
@@ -158,8 +161,7 @@ var Audiogram = Spine.Controller.create({
     ctx.fillText(this.settings.title, opt.boxWidth/2-20, 20);
     ctx.font = '12pt Arial';
     ctx.fillText('Frequenz [Hz]', opt.boxWidth/2-50, 40);
-    // rotate
-    ctx.save()
+    ctx.save() // rotate
     ctx.translate(25,opt.boxHeight/2+50);
     ctx.rotate(-Math.PI/2);
     ctx.fillText('Hörverlust [HL]', 0, 0);
@@ -212,8 +214,6 @@ var Audiogram = Spine.Controller.create({
       , x = this.curPos[0]
       , y = this.curPos[1];
 
-    ctx.save();
-
     ctx.beginPath()
     ctx.lineCap = 'round';
     ctx.lineWidth = 2;
@@ -222,8 +222,6 @@ var Audiogram = Spine.Controller.create({
     ctx.moveTo(x-l,y+l);
     ctx.lineTo(x+l,y-l);
     ctx.stroke();
-
-    ctx.restore();
   }
 });
 
@@ -237,7 +235,6 @@ $(document).ready(function() {
       'color': '#00f'
     }
   });
-
   ag2 = Audiogram.init({
     el: $('#audio2'),
     pos: $('#pos2'),

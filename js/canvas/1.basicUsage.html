@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Canvas Demo - Basic Usage</title>
+    <style type='text/css'>
+      #tutorial {
+        border: 1px solid black;
+      }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      var canvas = document.querySelector('#tutorial');
+      if (!canvas.getContext) {
+        alert('no <canvas> support');
+        return;
+      }
+
+      var ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgb(200, 0, 0)';
+      ctx.fillRect(10, 10, 55, 50);
+
+      ctx.fillStyle = 'rgba(0, 0, 200, 0.5)';
+      ctx.fillRect(30, 30, 55, 50);
+
+    });
+    </script>
+  </head>
+  <body>
+    <h1>Canvas Demo - Basic Usage</h1>
+    <canvas id='tutorial' width='150' height='150'></canvas>
+
+  </body>
+</html>

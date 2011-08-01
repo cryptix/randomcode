@@ -2,7 +2,7 @@
 
 term=urxvtc
 
-choice=`awk -F'"' '/"\)/{print $2}' ~/bin/stmenu.sh | dmenu -p 'st:'`
+choice=`awk -F'"' '/"\)/{print $2}' ~/bin/terMenu.sh | dmenu -p 'start:'`
 case $choice  in
   "ssh")
     host=`awk '/^Host/{print $2}' ~/.ssh/config | dmenu -p 'ssh:'` && exec $term -e ssh $host

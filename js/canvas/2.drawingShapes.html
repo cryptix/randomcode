@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Canvas Demo - Drawing Shapes</title>
+    <style type='text/css'>
+      canvas { border: 1px solid black; }
+      dt { margin-top: 20px }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      var canvas = document.querySelector('#rect');
+      if (!canvas.getContext) {
+        alert('no <canvas> support');
+        return;
+      }
+
+      var ctx = {};
+      ['rect', 'paths'].forEach(function (e) {
+        ctx[e] = document.querySelector('#' + e).getContext('2d');
+      });
+      console.dir(ctx);
+
+      (function rect(ctx) {
+        // draws a filled rectangle
+        ctx.fillRect(25, 25, 250, 250);
+
+        // clears the area and makes it fully transparent
+        ctx.clearRect(50, 50, 200, 200);
+
+        ctx.strokeStyle = '#00ff00';
+        for(var i = 0; i < 14; i += 1) {
+          // draws a rectangle outline
+          ctx.strokeRect(60, 190 - 10*i , 50 + i*10, 50 + i*10);
+        }
+
+        ctx.strokeStyle = '#ff0000';
+        for(var i = 0; i < 14; i += 1) {
+          ctx.strokeRect(60 + i*10, 60 + i* 10, 50, 50);
+        }
+        
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#0000ff';
+        ctx.fillRect(120, 120, 60, 60);
+      }(ctx.rect));
+
+      (function paths(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(25, 25);
+        ctx.lineTo(100, 75);
+        ctx.lineTo(100, 25);
+        ctx.closePath(); // optional actually
+        ctx.fill();
+      }(ctx.paths));
+
+      (function fcsp(ctx) {
+        ctx.beginPath();
+        ctx.moveTo(125, 25);
+        ctx.lineTo(125, 75);
+        ctx.moveTo(125, 50);
+        ctx.lineTo(150, 50);
+        ctx.moveTo(125, 25);
+        ctx.lineTo(160, 25);
+        ctx.stroke(); // F
+
+
+        ctx.beginPath();
+        ctx.moveTo(195, 25);
+        ctx.lineTo(165, 25);
+        ctx.lineTo(165, 75);
+        ctx.lineTo(195, 75);
+        ctx.stroke(); // C
+
+        ctx.beginPath();
+        ctx.moveTo(235, 25);
+        ctx.lineTo(200, 25);
+        ctx.lineTo(200, 50);
+        ctx.lineTo(235, 50);
+        ctx.lineTo(235, 75);
+        ctx.lineTo(200, 75);
+        ctx.stroke(); // S
+
+        ctx.beginPath();
+        ctx.moveTo(240, 75);
+        ctx.lineTo(240, 25);
+        ctx.lineTo(270, 25);
+        ctx.lineTo(270, 50);
+        ctx.lineTo(240, 50);
+        ctx.stroke(); // P
+      }(ctx.paths));
+
+      (function arcs(ctx) {
+        for(var i=0;i<4;i++){
+          for(var j=0;j<3;j++){
+            ctx.beginPath();
+            var x              = 25+j*50;               // x coordinate
+            var y              = 100+i*50;               // y coordinate
+            var radius         = 20;                    // Arc radius
+            var startAngle     = 0;                     // Starting point on circle
+            var endAngle       = Math.PI+(Math.PI*j)/2; // End point on circle
+            var anticlockwise  = i%2==0 ? false : true; // clockwise or anticlockwise
+
+            ctx.arc(x,y,radius,startAngle,endAngle, anticlockwise);
+
+            if (i>1){
+              ctx.fill();
+            } else {
+              ctx.stroke();
+            }
+          }
+        }
+      }(ctx.paths));
+    });
+    </script>
+  </head>
+  <body>
+    <h1>Canvas Demo - Drawing Shapes</h1>
+
+    <h2>Rectangles</h2>
+    <dl>
+      <dt>fillRect(x,y,width,height)</dt>
+      <dd>Draws a filled rectangle</dd>
+
+      <dt>strokeRect(x,y,width,height)</dt>
+      <dd>Draws a rectangular outline</dd>
+
+      <dt>clearRect(x,y,width,height)</dt>
+      <dd>Clears the specified area and makes it fully transparent</dd>
+    </dl>
+    <canvas id='rect' width='300' height='300'></canvas>
+
+    <h2>Paths</h2>
+    <dl>
+      <dt>beginPath()</dt>
+      <dd>Start a new group of sub-paths (lines, arcs, etc)</dd>
+      
+      <dt>closePath()</dt>
+      <dd>Draws a straight line from start to </dd>
+
+      <dt>stroke()</dt>
+      <dd></dd>
+
+      <dt>fill()</dt>
+      <dd></dd>
+    </dl>
+    <canvas id='paths' width='300' height='300'></canvas>
+    <ol>
+  </body>
+</html>

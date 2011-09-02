@@ -2,6 +2,14 @@
 
 term=urxvtc
 
+CACHE=${XDG_CACHE_HOME:-"$HOME/.cache"}/dmenu_run
+(
+  IFS=:
+  if test "`ls -dt $PATH "$CACHE" 2> /dev/null | sed 1q`" != "$CACHE"; then
+    mkdir -p "`dirname "$CACHE"`" && lsx $PATH | sort -u > "$CACHE"
+  fi
+)
+
 choice=`awk -F'"' '/"\)/{print $2}' ~/bin/terMenu.sh | dmenu -p 'start:'`
 case $choice  in
   "ssh")
@@ -16,11 +24,11 @@ case $choice  in
   ;;
 
   "window")
-    dmenu_run -p 'win'
+    cmd=`dmenu -p 'Window:' < "$CACHE"` && exec $cmd
   ;;
 
   "term")
-    cmd=`dmenu_path | dmenu -p 'cmd'` && exec $term -e '$cmd'
+    cmd=`dmenu -p 'Term:' < "$CACHE"` && exec $term -e $cmd
   ;;
 
   *)

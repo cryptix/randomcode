@@ -50,10 +50,19 @@ con.on('data', function(data) {
     case '19': // level lock
       ret = 'S>7=' + par;
       break;
+    case '21': // set menu
+      ret = 'S>15=' + par;
+      break;
+    case '84':
+      ret += 'D>1\tMüller\tHeinz\t13.08.1965\t019283\r';
+      ret += 'D>2\tBerger\tAndreas\t27.01.1985\t019284\r';
+      ret += 'D>3\tPeters\tMartin\t01.02.1960\t019285\r';
+      ret += 'D>4\tPeters\tIngrid\t26.11.1956\t019286\r';
+      break;
   }
 
   console.log('cmd[%s] par[%s] ret[%s]', cmd, par, ret);
 
-  ret += '\rR>0x00000001\r';
+  ret += (cmd == 84) ? 'D>0\r' : '\rR>0x00000001\r';
   con.write(ret);
 });

@@ -12,6 +12,12 @@ CACHE=${XDG_CACHE_HOME:-"$HOME/.cache"}/dmenu_run
 
 choice=`awk -F'"' '/"\)/{print $2}' ~/bin/terMenu.sh | dmenu -p 'start:'`
 case $choice  in
+  "open")
+     cd $(for f in $(pidof zsh)
+       do echo $(ls -l /proc/$f/cwd | cut -d'>' -f2)
+     done | dmenu -p 'open:') && exec $term
+  ;;
+
   "ssh")
     host=`awk '/^Host/{print $2}' ~/.ssh/config | dmenu -p 'ssh:'` && exec $term -e ssh $host
   ;;
@@ -35,4 +41,3 @@ case $choice  in
     cd $choice && exec $term
   ;;
 esac
-

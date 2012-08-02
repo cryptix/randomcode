@@ -15,15 +15,15 @@ do
 					printf("%.0f\n",end/1024)
 				}' /proc/meminfo `
 
-	_bat=`acpitool | awk '/Battery #1/{cd=$4; perc=$5; time=$6} END {
-			if(cd == "discharging,")
-				printf("-] %s left",substr(time,0,5))
-			else {
-				sub("%,","%",perc);
-		   		printf("+] %s full",perc) 
-			}
-		} '`
+#	_bat=`acpitool | awk '/Battery #1/{cd=$4; perc=$5; time=$6} END {
+#			if(cd == "discharging,")
+#				printf("-] %s left",substr(time,0,5))
+#			else {
+#				sub("%,","%",perc);
+#		   		printf("+] %s full",perc) 
+#			}
+#		} '`
 
-	xsetroot -name "perf[$_load ${_mem}m] date[$_date] bat[$_bat]"
+	xsetroot -name "perf[$_load ${_mem}m] date[$_date]"
 	sleep 15
 done

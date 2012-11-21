@@ -13,9 +13,8 @@ CACHE=${XDG_CACHE_HOME:-"$HOME/.cache"}/dmenu_run
 choice=`awk -F'"' '/"\)/{print $2}' ~/bin/terMenu.sh | dmenu -p 'start:'`
 case $choice  in
   "open")
-     cd $(for f in $(pidof zsh)
-       do echo $(ls -l /proc/$f/cwd | cut -d'>' -f2)
-     done | dmenu -p 'open:') && exec $term
+    pids=$(pgrep zsh)
+    cd $(ls -ld /proc/*/cwd | awk "/${pids//$'\n'/|}/{print \$NF}" | sort -u | dmenu -p 'open:') && exec $term
   ;;
 
   "ssh")

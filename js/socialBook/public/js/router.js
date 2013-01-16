@@ -1,4 +1,6 @@
-define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'], function(indexView, registerView, loginView, forgotPasswordView) {
+define(['views/index', 'views/register', 'views/login', 'views/forgotpassword',
+    'views/profile', 'models/Account', 'models/StatusCollection'],
+function(indexView, registerView, loginView, forgotPasswordView, profileView, Account, StatusCollection) {
   var SocialRouter = Backbone.Router.extend({
     currentView: null,
 
@@ -6,7 +8,8 @@ define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'],
       'index': 'index',
       'login': 'login',
       'register': 'register',
-      'forgotpassword': 'forgotpassword'
+      'forgotpassword': 'forgotpassword',
+      'profile/:id': 'profile'
     },
 
     changeView: function(view) {
@@ -18,7 +21,12 @@ define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'],
     },
 
     index: function() {
-      this.changeView(new indexView());
+      var statusCollection = new StatusCollection();
+      statusCollection.url = '/accounts/me/activity';
+      this.changeView(new indexView({
+        collection: statusCollection
+      }));
+      statusCollection.fetch();
     },
 
     login: function() {
@@ -32,6 +40,12 @@ define(['views/index', 'views/register', 'views/login', 'views/forgotpassword'],
     forgotpassword: function() {
       this.changeView(new forgotpasswordView());
     },
+
+    profile: function(id) {
+      var model = new Account({id: id});
+      this.changeView(new profileView({model: model}));
+      model.fetch();
+    }
   });
 
   return new SocialRouter();

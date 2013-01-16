@@ -3,6 +3,7 @@ var express    = require('express'),
     nodemailer = require('nodemailer'),
     mongoose   = require('mongoose');
 
+var app = express();
 var MemoryStore = require('connect').session.MemoryStore;
 
 ////
@@ -11,8 +12,6 @@ var MemoryStore = require('connect').session.MemoryStore;
 var config = {
   mail: require('./config/mail')
 };
-
-var app = express();
 
 var Account = require('./models/Account')(config, mongoose, nodemailer);
 
@@ -42,7 +41,7 @@ app.post('/register', function(req, res) {
   var email     = req.param('email', null);
   var password  = req.param('password', null);
 
-  if ( null == email || null === password) {
+  if (null == email || email.length < 5 || null == password || password.length < 3) {
     res.send(400);
     return;
   }
@@ -119,13 +118,14 @@ app.get('/account/authenticated', function(req, res) {
   }
 });
 
-// profile pages
-
+// profile page
 app.get('/accounts/:id', function(req, res) {
   //TODO: refactor auth check
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-
   Account.findById(accountId, function(account) {
+    if (accountId == 'me' || Account.hasContact(account, req.session.accountId) ) {
+      account.isFriend = true;
+    }
     delete account['password'];
     res.send(account);
   });
@@ -134,7 +134,6 @@ app.get('/accounts/:id', function(req, res) {
 // status
 app.get('/accounts/:id/status', function(req, res) {
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
-
   Account.findById(accountId, function(account) {
     res.send(account.status);
   });
@@ -142,6 +141,7 @@ app.get('/accounts/:id/status', function(req, res) {
 
 app.post('/accounts/:id/status', function(req, res) {
   //TODO: refactor auth check
+  //TODO: escape status text to clear xss
   var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
 
   Account.findById(accountId, function(acc) {
@@ -170,4 +170,81 @@ app.get('/accounts/:id/activity', function(req, res) {
   });
 });
 
+// contacts
+app.get('/accounts/:id/contacts', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+
+  Account.findById(accountId, function(acc) {
+    res.send(acc.contacts);
+  });
+});
+
+app.post('/accounts/:id/contact', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  var contactId = req.param('contactId', null);
+
+  if (null == contactId || contactId.length < 1) {
+    res.send(400);
+    return;
+  }
+
+  Account.findById(accountId, function(acc) {
+    if (acc) {
+      Account.findById(contactId, function(cont) {
+        Account.addContact(acc, cont);
+
+        // reverse Link
+        Account.addContact(cont, acc);
+        //acc.save();
+      });
+    }
+  });
+
+  // returns immediatly and processes in background
+  res.send(200);
+});
+
+app.delete('/accounts/:id/contact', function(req, res) {
+  var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
+  var contactId = req.param('contactId', null);
+
+  if (null == contactId) {
+    res.send(400);
+    return;
+  }
+
+  Account.findById(accountId, function(acc) {
+    if(!acc) return;
+    Account.findById(contactId, function(cont, err) {
+      if (!cont) return;
+
+      Account.removeContact(acc, contactId);
+      Account.removeContact(cont, accountId);
+    });
+  });
+
+  // returns immediatly and processes in background
+  res.send(200);
+});
+
+app.post('/contacts/find', function(req, res) {
+  // TODO: auth check
+  var searchStr = req.param('searchStr', null);
+  if (null == searchStr || searchStr.length < 1) {
+    res.send(400);
+    return;
+  }
+
+  Account.findByString(searchStr, function onSearchDone(err, accounts) {
+    if(err || accounts.length == 0) {
+      res.send(404);
+    } else {
+      res.send(accounts);
+    }
+  });
+});
+
+
+// start listening
 app.listen(8080);
+console.log('Listening on port 8080');

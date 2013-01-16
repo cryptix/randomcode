@@ -19,9 +19,8 @@ define(['text!templates/index.html', 'views/status', 'models/Status'], function(
       });
     },
 
-    onStatusAdded: function(status) {
-      var view = new StatusView({ model: status })
-      var statusHtml = view.render();
+    onStatusAdded: function(statusModel) {
+      var statusHtml = (new StatusView({model: statusModel})).render();
       $(statusHtml).prependTo('.status_list').hide().fadeIn('slow');
     },
 

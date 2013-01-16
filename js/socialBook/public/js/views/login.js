@@ -12,6 +12,9 @@ define(['text!templates/login.html'], function(loginTemplate) {
         password: $('input[name=password]').val()
       }, function(data) {
         console.log(data);
+        if (data === 'OK') {
+          window.location.hash = '#index'
+        }
       }).error(function() {
         $('#error').text('Unable to login.');
         $('#error').slideDown();

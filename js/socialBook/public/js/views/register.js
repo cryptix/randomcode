@@ -16,6 +16,9 @@ define(['text!templates/register.html'], function(registerTemplate) {
       }, function(data) {
         //TODO: check response for errors (e.g. user exists, bad data)
         console.log(data);
+        if(data == "OK") {
+          window.location.hash = "#login";
+        }
       });
       return false;
     },

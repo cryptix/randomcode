@@ -1,3 +1,7 @@
+////
+// Accout Model
+//
+
 // TODO: update to a random per user based salt
 var SECRET_SALT = "9d311ad88ba1fd80b0c143bd19377f3da94a4cbaada1a39fa253c4b488f360ed7d62ba6234514ff1d3060d8914b244bee38573cded144bb59c6dbd8ce7ab581a";
 

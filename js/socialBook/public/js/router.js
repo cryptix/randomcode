@@ -8,6 +8,8 @@ function(indexView, registerView, loginView, forgotPasswordView,
   var SocialRouter = Backbone.Router.extend({
     currentView: null,
 
+    socketEvents: _.extend({}, Backbone.Events),
+
     routes: {
       'addcontact': 'addcontact',
       'index': 'index',
@@ -40,7 +42,7 @@ function(indexView, registerView, loginView, forgotPasswordView,
     },
 
     login: function() {
-      this.changeView(new loginView());
+      this.changeView(new loginView({socketEvents: this.socketEvents}));
     },
 
     register: function() {

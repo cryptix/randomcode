@@ -3,3 +3,5 @@ a.out
 # vim stuff
 *~
 *.swp
+#node stuff
+node_modules

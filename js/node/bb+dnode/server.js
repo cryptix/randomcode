@@ -27,13 +27,21 @@ var Mongoose = require('mongoose')
 
 var database = Mongoose.connect('mongodb://localhost/bbTest');
 
-var Foo = new Schema({
+var FooSchema = new Schema({
   bar     : { type: String, index: true},
   created : { type: Date, default: Date.now }
 });
+database.model('foo', FooSchema);
 
 middleware.crud.config(database);
 
 server.listen(3000, '127.0.0.1', function() {
   console.log('Express is listening');
 });
+
+dnode()
+    .use(middleware.pubsub) // Pub/sub channel support
+    .use(middleware.crud)   // Backbone integration
+    .listen(server)         // Start your engines!
+
+

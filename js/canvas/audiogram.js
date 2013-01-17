@@ -225,9 +225,8 @@ var Audiogram = Spine.Controller.create({
   }
 });
 
-var ag1, ag2;
 $(document).ready(function() {
-  ag1 = Audiogram.init({
+  window.ag1 = Audiogram.init({
     el: $('#audio1'),
     pos: $('#pos1'),
     settings: {
@@ -235,7 +234,7 @@ $(document).ready(function() {
       'color': '#00f'
     }
   });
-  ag2 = Audiogram.init({
+  window.ag2 = Audiogram.init({
     el: $('#audio2'),
     pos: $('#pos2'),
     settings: {

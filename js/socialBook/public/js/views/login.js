@@ -6,15 +6,16 @@ define(['text!templates/login.html'], function(loginTemplate) {
       "submit form": "login"
     },
 
+    initialize: function(opts) {
+      this.socketEvents = opts.socketEvents;
+    },
+
     login: function() {
-      $.post('/login', {
-        email: $('input[name=email]').val(),
-        password: $('input[name=password]').val()
-      }, function(data) {
-        console.log(data);
-        if (data === 'OK') {
+      var sockEvents = this.socketEvents;
+      $.post('/login',
+        this.$('form').serialize(), function(data) {
+          sockEvents.trigger('app:loggedin');
           window.location.hash = '#index'
-        }
       }).error(function() {
         $('#error').text('Unable to login.');
         $('#error').slideDown();

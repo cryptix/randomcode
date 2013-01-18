@@ -1,12 +1,14 @@
-define(['router'], function(router) {
+define(['router', 'SocialNetSockets'], function(router, socket) {
   var initialize = function() {
+    socket.initialize(router.socketEvents);
     checkLogin(runApplication);
   };
 
   var checkLogin = function(callback) {
     $.ajax('/account/authenticated', {
       method: 'GET',
-      success: function() {
+      success: function(data) {
+        router.socketEvents.trigger('app:loggedin', data);
         return callback(true);
       },
       error: function(data) {
@@ -21,7 +23,6 @@ define(['router'], function(router) {
     } else {
       window.location.hash = 'index';
     }
-
     Backbone.history.start();
   };
 

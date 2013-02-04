@@ -2,8 +2,9 @@
 
 #location to make backups
 loc=/mnt/backup
+weekDir=$loc/$(date +%Y-%W)
 
-cPub=~cryptix/backupkey.pub   # lives at Company HQ
+cPub=~cryptix/backupkey.pub   # lives on the server
 
 function errOut {
 	echo "Backup Failed! $1 - $2"
@@ -14,34 +15,49 @@ function errOut {
 function encANDpack {
 	dir=$1
 	file=$2-$(date +%Y-%m-%d)
-	wdir=$loc/$(openssl rand -hex 12)
-	
-	mkdir $wdir && cd $wdir							 || errOut $file "#0 creating wdir"
-	
-	(tar cfP /dev/stdout $dir | pxz -z - > ./$file.tar.xz) || errOut $file "#1 taring $dir"
-	
-	openssl rand -out ./skey.clear 500				 || errOut $file "#2 generate SKey"
-	
-	openssl enc -aes-256-cbc -e -salt \
-		-in ./$file.tar.xz \
-		-out ./$file.enc \
-		-kfile ./skey.clear							 || errOut $file "#3 encrypt tar using SKey"
-	
-	openssl rsautl -encrypt -pubin \
-		-inkey $cPub \
-		-in ./skey.clear \
-		-out ./skey.enc 							 || errOut $file "#4 encrypt skey with pubkey"
-	
 
-	tar cf $file.packed ./$file.enc ./skey.enc 		 || errOut $file "#5 packing up"
-
-	##  backups will be pushed at the weekend
-
-	#echo '# 5. pushing via tarsnap'
-	#tarsnap -c -f $file ./$file.enc ./skey.enc || exit 1
+	wdir=$(openssl rand -hex 12)
 	
-	#echo '# housekeeping'
-	mv $file.packed .. && cd .. && rm -rf $wdir		 || errOut $file "#6 clean up"
+	mkdir -p $loc/tmp/$wdir && cd $loc/tmp/$wdir	       			|| errOut $file "#0 creating wdir"
+	
+	(tar cfP /dev/stdout $dir | pxz -z - > ./$file.tar.xz) 			|| errOut $file "#1 taring $dir"
+
+	sha256sum ./$file.tar.xz > ./$file.sha256	       			|| errOut $file "#1.5 hashing .tar"
+	
+	shasum=$(cut -d' ' -f1 ./$file.sha256)	# extract shasum
+
+	grep -q $shasum $loc/hashes/$2 
+
+	# if there is a match, dont store backup
+	if [ $? -eq 1 ]; then
+		# new backup!
+		echo $shasum >> $loc/hashes/$2 # appending new hash
+		
+		openssl rand -out ./skey.clear 500			    	|| errOut $file "#2 generate SKey"
+		
+		openssl enc -aes-256-cbc -e -salt \
+			-in ./$file.tar.xz \
+			-out ./$file.enc \
+			-kfile ./skey.clear		       			|| errOut $file "#3 encrypt tar using SKey"
+		
+		openssl rsautl -encrypt -pubin \
+			-inkey $cPub \
+			-in ./skey.clear \
+			-out ./skey.enc 		       			|| errOut $file "#4 encrypt skey with pubkey"
+		
+
+		tar cf $file.packed ./$file.enc ./$file.sha256 ./skey.enc	|| errOut $file "#5 packing up"
+
+		##  backups will be pushed at the weekend
+
+		#echo '# 5. pushing via tarsnap'
+		#tarsnap -c -f $file ./$file.enc ./skey.enc || exit 1
+		
+		#echo '# housekeeping'
+		mkdir -p $weekDir && mv $file.packed $weekDir/ 
+	fi
+
+	cd .. && rm -rf $wdir	|| errOut $file "#6 clean up"
 }
 
 

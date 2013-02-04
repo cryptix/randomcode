@@ -1,5 +1,6 @@
 var AppChatController = {
   init: function() {
+    //this.socket = io;
     this.socket = new io.Socket(null, {port: 8000});
 
     this.model = new models.AppChatModel();

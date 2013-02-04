@@ -57,7 +57,7 @@ var AppChatView = Backbone.View.extend({
     var nameField = $('input[name=user_name]');
     var inputField = $('input[name=message]');
     var chatEntry = new models.ChatEntry({name: nameField.val(), text: inputField.val()});
-    this.socket.send(chatEntry.xport());
+    this.socket.emit("message", chatEntry.xport());
     inputField.val('');
   }
 });

@@ -8,7 +8,7 @@ module.exports = function(app, models) {
     var lastName  = req.param('lastName', '');
     var email     = req.param('email', null);
     var password  = req.param('password', null);
-    if (null == email || email.length < 5 || null == password || password.length < 3) {
+    if (null === email || email.length < 5 || null === password || password.length < 3) {
       res.send(400);
       return;
     }
@@ -20,7 +20,7 @@ module.exports = function(app, models) {
   app.post('/login', function(req, res) {
     var email    = req.param('email', null);
     var password = req.param('password', null);
-    if (null == email || email.length < 5 || null == password || password.length < 3) {
+    if (null === email || email.length < 5 || null === password || password.length < 3) {
       res.send(400);
       return;
     }
@@ -48,7 +48,7 @@ module.exports = function(app, models) {
     var hostname = req.headers.host;
     var resetPasswordUrl = 'http://' + hostname + '/resetPassword';
     var email = req.param('email', null);
-    if( null == email || email.length < 5) {
+    if( null === email || email.length < 5) {
       res.send(400);
       return;
     }
@@ -70,7 +70,7 @@ module.exports = function(app, models) {
   app.post('/resetPassword', function(req, res) {
     var accountId = req.param('account', null);
     var password  = req.param('password', null);
-    if (null != accountId && null != password) {
+    if (null !== accountId && null !== password) {
       models.Account.changePassword(accountId, password);
     }
     res.render('resetPasswordSuccess.jade');

@@ -7,7 +7,7 @@ module.exports = function(app, models) {
     //TODO: refactor auth check
     var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
     models.Account.findById(accountId, function(account) {
-      if (account == null) res.send(500);
+      if (account === null) res.send(500);
       if (accountId == 'me' || models.Account.hasContact(account, req.session.accountId) ) {
         account.isFriend = true;
       }
@@ -28,7 +28,7 @@ module.exports = function(app, models) {
   app.post('/accounts/:id/contact', function(req, res) {
     var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
     var contactId = req.param('contactId', null);
-    if (null == contactId) {
+    if (null === contactId) {
       res.send(400);
       return;
     }
@@ -49,7 +49,7 @@ module.exports = function(app, models) {
   app.delete('/accounts/:id/contact', function(req, res) {
     var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
     var contactId = req.param('contactId', null);
-    if (null == contactId) {
+    if (null === contactId) {
       res.send(400);
       return;
     }
@@ -69,12 +69,12 @@ module.exports = function(app, models) {
   app.post('/contacts/find', function(req, res) {
     // TODO: auth check
     var searchStr = req.param('searchStr', null);
-    if (null == searchStr || searchStr.length < 1) {
+    if (null === searchStr || searchStr.length < 1) {
       res.send(400);
       return;
     }
     models.Account.findByString(searchStr, function onSearchDone(err, accounts) {
-      if(err || accounts.length == 0) {
+      if(err || accounts.length === 0) {
         res.send(404);
       } else {
         res.send(accounts);
@@ -122,7 +122,7 @@ module.exports = function(app, models) {
   app.get('/accounts/:id/activity', function(req, res) {
     var accountId = req.params.id == 'me' ? req.session.accountId : req.params.id;
     models.Account.findById(accountId, function(acc) {
-      if (acc == null) return res.send(500); // TODO: had this on iPad. reproduce!
+      if (acc === null) return res.send(500); // TODO: had this on iPad. reproduce!
       res.send(acc.activity);
     });
   });

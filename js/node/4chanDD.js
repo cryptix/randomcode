@@ -13,6 +13,27 @@ fs.mkdir(threadNum, '0700', function(err) {
    if(!err) console.log('Created:', threadNum);
 });
 
+function fetchImage (link) {
+  var fname = path.basename(link);
+  var u = url.parse("http:" + link);
+  var opt = {host: u.host, port: u.port||80, path: u.pathname||'/'};
+
+  http.get(opt,function(res) {
+    var file = fs.createWriteStream(path.join(threadNum,fname));
+
+    if(res.statusCode === 200) {
+      res.pipe(file);
+    }
+
+    res.on('end', function() {
+       console.log('saved:',file.path);
+    });
+
+    res.on('error', function(e) {
+      console.log("Got error: " + e.message);
+    });
+  });
+}
 
 jsdom.env(boardUrl,
   ['http://code.jquery.com/jquery-1.5.min.js'],
@@ -20,29 +41,11 @@ jsdom.env(boardUrl,
     var $ = window.$;
     var reg = new RegExp(/images\.4chan\.org/);
     
-    $('.filesize > a').each(function() {
+    $('.fileText > a').each(function() {
       var lnk = $(this).attr('href');
       
       if(reg.test(lnk)) {
-        var fname = path.basename(lnk);
-        var u = url.parse(lnk);
-        var opt = {host: u.host, port: u.port||80, path: u.pathname||'/'};
-        
-        http.get(opt,function(res) {
-          var file = fs.createWriteStream(path.join(threadNum,fname));
-          
-          if(res.statusCode === 200) {
-            res.pipe(file);
-          }
-          
-          res.on('end', function() {
-             console.log('saved:',file.path); 
-          });
-          
-          res.on('error', function(e) {
-            console.log("Got error: " + e.message);
-          });
-        });
+        fetchImage(lnk);
       }
     });
   }

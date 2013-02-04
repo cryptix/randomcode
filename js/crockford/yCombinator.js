@@ -1,12 +1,15 @@
-function y(le) {
+function y(cb) {
+	var anon1 = function (f) {
+		return cb(function (x) {
+			return f(f)(x);
+		});
+	
+	};
+
 	return (function (f) {
 		return f(f);
-	}(function (f) {
-		return le(function (x) {
-			return f(f)(x);
-		})
-	}));
-};
+	}(anon1));
+}
 
 var factorial = y(function (fac) {
 	return function (n) {
@@ -14,4 +17,7 @@ var factorial = y(function (fac) {
 	};
 });
 
-var num120 = factorial(5);
+for (var i = 1; i < 10; i++) {
+	console.log(i + ": " + factorial(i));
+}
+

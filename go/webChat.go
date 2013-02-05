@@ -83,6 +83,7 @@ func (s socket) Close() error {
 }
 
 func socketHandler(ws *websocket.Conn) {
+	defer ws.Close() // http://adventuresingoland.blogspot.de/2011/04/prevent-memory-leaks-when-using.html#links
 	s := socket{ws, make(chan bool)}
 	go match(s)
 	<-s.done

@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title>Hubbl</title>
+		<!-- Libraries -->
+	</head>
+	<body>
+		<div class="container">
+			
+			<div class="head">
+				<nav>
+					<ul class="menu">
+						<li class="menu-item selected">
+							<a href="apage.html">A Page</a>
+						</li>
+						<li class="menu-item">
+							<a href="anotherpage.html">Another Page</a>
+						</li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="content"></div>
+			
+			<div class="footer"></div>
+		</div>
+
+		<!-- scripts at the end to improve loading speed -->
+		<script src='components/jquery/jquery.js'></script>
+		<script src='components/es5-shim/es5-shim.js'></script>
+		<script src='components/es5-shim/es5-sham.js'></script>
+		<script data-main='requireMain.js' src='components/requirejs/require.js.js'></script>
+
+		<!-- My Components -->
+		<script src='components/navigationMenu.js'></script>
+	    <script>
+	      require(
+	        [
+	          'components/flight/lib/compose',
+	          'components/flight/lib/registry',
+	          'components/flight/lib/advice',
+	          'components/flight/lib/logger',
+	          'components/flight/tools/debug/debug'
+	        ],
+
+	        function(compose, registry, advice, withLogging, debug) {
+	          debug.enable(true);
+	          compose.mixin(registry, [advice.withAdvice, withLogging]);
+	          require(['app/boot/page'], function(initialize) {
+	            initialize();
+	          });
+	        }
+	      );
+	    </script>
+	</body>
+</html>

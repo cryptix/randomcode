@@ -8,5 +8,5 @@ signed=$(curl "https://epetitionen.bundestag.de/index.php?action=petition;sa=det
 	| tr -d '>' \
 	)
 left=$(echo "50000 - $signed" | bc)
-echo $(date): $signed ppl signed. $left left..
+echo $(date): $signed ppl signed. $left left
 done

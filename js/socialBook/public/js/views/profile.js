@@ -8,7 +8,8 @@ define(['text!templates/profile.html', 'text!templates/status.html', 'models/Sta
       'submit form': 'postStatus'
     },
 
-    initialize: function() {
+    initialize: function(opts) {
+      this.socketEvents = opts.socketEvents;
       this.model.bind('change', this.render, this);
     },
 
@@ -18,8 +19,6 @@ define(['text!templates/profile.html', 'text!templates/status.html', 'models/Sta
       var statusCollection = this.collection;
       $.post('/accounts/' + this.model.get('_id') + '/status', {
         status: statusText
-      }, function(data) {
-        view.prependStatus(new Status({status:statusText}));
       });
       return false;
     },
@@ -29,12 +28,20 @@ define(['text!templates/profile.html', 'text!templates/status.html', 'models/Sta
       $(statusHtml).prependTo('.status_list').hide().fadeIn('slow');
     },
 
+    onSocketStatusAdded: function(data) {
+      var newStatus = data.data;
+      this.prependStatus(new Status({
+        status:newStatus.status,
+          name:newStatus.name
+      }));
+    },
+
     render: function() {
       var view = this;
-      this.$el.html(
-        _.template(profileTemplate, this.model.toJSON())
-      );
-
+      if (this.model.get('_id')) {
+        this.socketEvents.bind('status:' + this.model.get('_id'), this.onSocketStatusAdded, this);
+      }
+      this.$el.html( _.template(profileTemplate, this.model.toJSON()));
       var statusCollection = this.model.get('status');
       if( null != statusCollection) {
         _.each(statusCollection, function(statusJson) {

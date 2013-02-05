@@ -1,17 +1,27 @@
-var app = require('express').createServer(),
-    jade = require('jade'),
-    socket = require('socket.io').listen(app),
-    _ = require('underscore')._,
+var express  = require('express'),
+    http     = require('http'),
+    jade     = require('jade'),
+    sio      = require('socket.io'),
+    _        = require('underscore')._,
     Backbone = require('backbone'),
-    redis = require('redis'),
-    rc = redis.createClient(),
-    models = require('./models/models.js');
+    redis    = require('redis'),
+    rc       = redis.createClient(),
+    models   = require('./models/models.js');
 
-app.set('view engine', 'jade');
-app.set('view options', {layout: false});
+var app = express();
+app.server = http.createServer(app);
 
-app.get('/*.(js|css)', function(req, res) {
-           res.sendfile('./' + req.url);
+
+
+
+// app.get('/*.(js|css)', function(req, res) {
+//   res.sendfile('./' + req.url);
+// });
+
+app.configure(function() {
+  app.set('view engine', 'jade');
+  app.set('view options', {layout: false});
+  app.use(express.static(__dirname));
 });
 
 app.get('/', function(req, res) {
@@ -35,15 +45,16 @@ rc.lrange('chatentries', -10, -1, function (err, data) {
   }
 });
 
+var socket = sio.listen(app.server);
 socket.on('connection', function(client) {
   activeClients += 1;
 
-  client.on('disconect', function () { 
+  client.on('disconect', function () {
     activeClients -= 1;
     client.broadcast({clients: activeClients});
   });
 
-  client.on('message', function(msg) { 
+  client.on('message', function(msg) {
     var chat = new models.ChatEntry();
     chat.mport(msg);
     
@@ -74,4 +85,5 @@ socket.on('connection', function(client) {
   });
 });
 
-app.listen(8000,'192.168.1.9');
+app.server.listen(8000);
+console.log('Server Listening');

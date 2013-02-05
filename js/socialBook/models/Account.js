@@ -5,7 +5,7 @@
 // TODO: update to a random per user based salt
 var SECRET_SALT = "9d311ad88ba1fd80b0c143bd19377f3da94a4cbaada1a39fa253c4b488f360ed7d62ba6234514ff1d3060d8914b244bee38573cded144bb59c6dbd8ce7ab581a";
 
-module.exports = function(config, mongoose, nodemailer) {
+module.exports = function(app, config, mongoose, nodemailer) {
   var crypto = require('crypto');
 
   var Status = new mongoose.Schema({
@@ -17,6 +17,15 @@ module.exports = function(config, mongoose, nodemailer) {
     status: { type: String }
   });
 
+  var schemaOptions = {
+    toJSON: {
+      virtuals: true
+    },
+    toObject: {
+      virtuals: true
+    }
+  };
+
   var Contact = new mongoose.Schema({
     name: {
       first: { type: String },
@@ -25,6 +34,10 @@ module.exports = function(config, mongoose, nodemailer) {
       accountId: { type: mongoose.Schema.ObjectId },
       added:     { type: Date },
       updated:   { type: Date }
+  }, schemaOptions);
+
+  Contact.virtual('online').get(function() {
+    return app.isAccountOnline(this.get('accountId'));
   });
 
   var AccountSchema = new mongoose.Schema({

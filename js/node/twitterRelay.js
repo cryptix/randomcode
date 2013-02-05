@@ -1,9 +1,9 @@
-var sys = require("sys"),
-    http = require("http"),
-    url = require("url"),
-    path = require("path"),
-    fs = require("fs"),
-    events = require("events");
+var sys    = require("sys"),
+	http   = require("http"),
+	url    = require("url"),
+	path   = require("path"),
+	fs     = require("fs"),
+	events = require("events");
 
 function load_static_file(uri, response) {
 	var filename = path.join(process.cwd(), uri);
@@ -57,29 +57,27 @@ function get_tweets() {
 setInterval(get_tweets, 5000);
 
 http.createServer(function(request, response) {
-    var uri = url.parse(request.url).pathname;
-    if(uri === "/stream") {
+	var uri = url.parse(request.url).pathname;
+	if(uri === "/stream") {
 
-    	var listener = tweet_emitter.addListener("tweets", function(tweets) {
-    		response.writeHead(200, { "Content-Type" : "text/plain" });
-    		response.write(JSON.stringify(tweets));
-    		response.end();
+		var listener = tweet_emitter.addListener("tweets", function(tweets) {
+			response.writeHead(200, { "Content-Type" : "text/plain" });
+			response.write(JSON.stringify(tweets));
+			response.end();
 
-    		clearTimeout(timeout);
-    	});
+			clearTimeout(timeout);
+		});
 
-    	var timeout = setTimeout(function() {
-    		response.writeHead(200, { "Content-Type" : "text/plain" });
-    		response.write(JSON.stringify([]));
-    		response.end();
+		var timeout = setTimeout(function() {
+			response.writeHead(200, { "Content-Type" : "text/plain" });
+			response.write(JSON.stringify([]));
+			response.end();
 
-    		tweet_emitter.removeListener(listener);
-    	}, 10000);
-
-    }
-    else {
-    	load_static_file(uri, response);
-    }
+			tweet_emitter.removeListener(listener);
+		}, 10000);
+	} else {
+		load_static_file(uri, response);
+	}
 }).listen(8080);
 
 sys.puts("Server running at http://localhost:8080/");

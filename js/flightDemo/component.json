@@ -1,0 +1,9 @@
+{
+	"name": "FlightDemo",
+	"version": "0.0.0",
+	"dependencies": {
+		"flight": "~1.0.0",
+		"bootstrap": "~2.2.2",
+		"mustache": "~0.7.0"
+	}
+}

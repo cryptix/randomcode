@@ -1,0 +1,7 @@
+{
+	"name": "Hubbl",
+	"version": "0.0.0",
+	"dependencies": {
+		"flight": "~1.0.0"
+	}
+}

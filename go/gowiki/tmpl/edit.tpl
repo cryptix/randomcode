@@ -8,3 +8,5 @@
 		<input type="submit" value="Save">
 	</div>
 </form>
+
+<a href="/">Back to Index</a>

@@ -5,10 +5,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 // Globals
-var templates = template.Must(template.ParseFiles("edit.tpl", "view.tpl"))
+var templates = template.Must(template.ParseFiles(templDir+"edit.tpl", templDir+"view.tpl", templDir+"index.tpl"))
 var titleValidator = regexp.MustCompile("^[a-zA-Z0-9]+$")
 
 // Page class
@@ -18,15 +19,13 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-	// TODO p.Title could be ../../../../../.bashrc :/ 
-	// path.basename()?
 	filename := p.Title + ".txt"
-	return ioutil.WriteFile(filename, p.Body, 0600)
+	return ioutil.WriteFile(pagesDir+filename, p.Body, 0600)
 }
 
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
-	body, err := ioutil.ReadFile(filename)
+	body, err := ioutil.ReadFile(pagesDir + filename)
 	if err != nil {
 		return nil, err
 	}
@@ -35,9 +34,13 @@ func loadPage(title string) (*Page, error) {
 
 // Handlers
 const (
-	viewPath = "/view/"
-	editPath = "/edit/"
-	savePath = "/save/"
+	templDir = "tmpl/"
+	pagesDir = "data/"
+
+	indexPath = "/view/FrontPage"
+	viewPath  = "/view/"
+	editPath  = "/edit/"
+	savePath  = "/save/"
 )
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -58,7 +61,7 @@ func viewHandler(rw http.ResponseWriter, req *http.Request, title string) {
 		http.Redirect(rw, req, editPath+title, http.StatusFound)
 		return
 	}
-	renderTemplae(rw, "view", p)
+	renderTemplate(rw, "view", p)
 }
 
 func editHandler(rw http.ResponseWriter, req *http.Request, title string) {
@@ -66,7 +69,7 @@ func editHandler(rw http.ResponseWriter, req *http.Request, title string) {
 	if err != nil {
 		p = &Page{Title: title}
 	}
-	renderTemplae(rw, "edit", p)
+	renderTemplate(rw, "edit", p)
 }
 
 func saveHandler(rw http.ResponseWriter, req *http.Request, title string) {
@@ -80,14 +83,34 @@ func saveHandler(rw http.ResponseWriter, req *http.Request, title string) {
 	http.Redirect(rw, req, viewPath+title, http.StatusFound)
 }
 
-func renderTemplae(rw http.ResponseWriter, tmpl string, p *Page) {
+func renderTemplate(rw http.ResponseWriter, tmpl string, p *Page) {
 	err := templates.ExecuteTemplate(rw, tmpl+".tpl", p)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	}
 }
 
+func indexHandler(rw http.ResponseWriter, req *http.Request) {
+	fileInfos, err := ioutil.ReadDir(pagesDir)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var pages []string
+	for _, p := range fileInfos {
+		if p.IsDir() == false {
+			pages = append(pages, strings.Replace(p.Name(), ".txt", "", 1))
+		}
+	}
+	err = templates.ExecuteTemplate(rw, "index.tpl", pages)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func main() {
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc(indexPath, indexHandler)
 	http.HandleFunc(viewPath, makeHandler(viewHandler))
 	http.HandleFunc(editPath, makeHandler(editHandler))
 	http.HandleFunc(savePath, makeHandler(saveHandler))

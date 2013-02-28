@@ -1,0 +1,32 @@
+!!! 5
+html(lang="en")
+  head
+    title shifted
+    link(href='/shifted.css', rel='stylesheet', type='text/css')
+    script(src='/jquery.min.js')
+    script(src='/underscore.js')
+    script(src='/backbone.js')
+    script(src='/bify.js')
+    script(src='/shifted.js')
+  body
+    #wrapper
+      h1 shifted - shift organizer
+      #container
+        
+
+    script(type='text/template')#shiftOverview
+      a(href='#')#addShift Add Shift
+      #shifts
+        h2 Monday
+        ol#monday
+        h2 Tuesday
+        ol#tuesday
+        h2 Wednsday
+        ol#wednsday
+        h2 Thursday
+        ol#thursday
+        h2 Friday
+        ol#friday
+               
+    script(type='text/template')#shiftInfo
+      div

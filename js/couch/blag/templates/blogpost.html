@@ -1,0 +1,16 @@
+<h1>{title}</h1>
+
+<p>{text}</p>
+
+{?comments}
+<h2>Comments</h2>
+
+<ul>
+	{#comments}
+		<li>
+			<strong>{creator} says: </strong>
+			{text}
+		</li>
+	{/comments}
+</ul>
+{/comments}

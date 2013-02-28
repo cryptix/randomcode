@@ -1,0 +1,13 @@
+<h1>My blog</h1>
+
+{?rows}
+	<ul>
+		{#rows}
+			<li>
+				<a href="{baseURL}/{id}">{value}</a>
+			</li>
+		{/rows}
+	</ul>
+{:else}
+	<p>No blog postgs</p>
+{/rows}

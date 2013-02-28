@@ -8,7 +8,8 @@ import (
 	"log"
 	"net/http"
 )
-https://gist.github.com/4699109
+
+// https://gist.github.com/4699109
 var rootTemplate = template.Must(template.New("root").Parse(`
 <!DOCTYPE html>
 <html>

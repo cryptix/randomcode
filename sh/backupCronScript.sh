@@ -11,7 +11,7 @@ encANDpack /srv/vmailer webmail
 encANDpack /srv/http	website
 
 #sql dumps
-sqlDir=/mnt/backup/sql-$(openssl rand -hex 5)
+sqlDir=$loc/sql-$(openssl rand -hex 5)
 mkdir $sqlDir && cd $sqlDir
 
 pg_dump -F t -U mailRole       mailUsers   > ./mailUsers.dump.tar
@@ -26,9 +26,14 @@ cd .. && rm -rf $sqlDir
 encANDpack /etc/postfix ConfPostfix
 encANDpack /etc/dovecot ConfDovecot
 encANDpack /etc/nginx   ConfNginx
-encANDpack /etc/ssh		ConfSSH
+encANDpack /etc/ssh	ConfSSH
 encANDpack /etc/openvpn ConfOpenVPN
 encANDpack /etc/clamav  ConfClamAV
 
+
+# cryptix
+encANDpack ~cryptix/code    cryptixCode
+encANDpack ~cryptix/Dropbox cryptixDropbox
+
 echo "Done with System Backup at $(date)"
-ls -lh *.packed
+ls -1s $weekDir

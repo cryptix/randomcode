@@ -10,15 +10,11 @@ const (
 	NUM = 600851475143
 )
 
-func main() {
-	start := time.Now()
-
-	limit := uint64(math.Sqrt(NUM))
-
+func buildSieve(limit uint64) (sieve []bool) {
 	// build sieve numbers
 	// more info on the sieve approach: https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
-	sieve := make([]bool, limit) // c for composite.  false means prime candidate
-	sieve[1] = true              // 1 not considered prime
+	sieve = make([]bool, limit) // c for composite.  false means prime candidate
+	sieve[1] = true             // 1 not considered prime
 	p := uint64(2)
 	for {
 		// first allowed optimization:  outer loop only goes to sqrt(limit)
@@ -39,6 +35,15 @@ func main() {
 			}
 		}
 	}
+	return
+}
+
+func main() {
+	start := time.Now()
+
+	limit := uint64(math.Sqrt(NUM))
+
+	sieve := buildSieve(limit)
 
 	sieveBuild := time.Now()
 	fmt.Printf("Building primes with Sieve of Eratosthenes took %v\n", sieveBuild.Sub(start))

@@ -1,0 +1,39 @@
+DSTSWISS = HEADER/20                                                    00001000
+************************************************************************00001010
+VDAFS VERSION      : 2.0                                                00001020
+----------ANGABEN UEBER DEN ABSENDER------------------------------------00001030
+SENDERFIRMA        : DST Swiss AG                                       00001040
+ANSPRECHPARTNER    : R. Diefenbacher                                    00001050
+- TELEFON          : +41 (0)44 868 30 88                                00001060
+- ADRESSE          : Schuebelbachstrasse 3, CH-8193, Eglisau, Schwiss   00001070
+ERZEUGENDES SYSTEM : ReportHelper 0.0                                   00001080
+ERZEUGUNGSDATUM    : 24.12.2013                                         00001090
+SENDE-FILENAME     : fname.txt                                          00001100
+----------ANGABEN UEBER DAS TEIL----------------------------------------00001110
+PROJEKT            : MessConvert                                        00001120
+OBJEKTKENNUNG      : 12 / FORM UND LAGE                                 00001130
+VARIANTE           : 1 / FORM UND LAGE                                  00001140
+VERTRAULICHKEIT    : Hoch                                               00001150
+GUELTIGKEITSDATUM  : Morgen                                             00001160
+----------ANGABEN UEBER/FUER DEN EMPFAENGER-----------------------------00001170
+EMPFAENGERFIRMA    : Test Firma                                         00001180
+EMPFAENGERART      :                                                    00001190
+************************************************************************00001200
+$$                                                                      00001210
+S1 = BEGINSET                                                           00001220
+$$                                                                      00001230
+$$      Element PT_1                                                    00001240
+$$      ------------                                                    00001250
+E1P1 = POINT /  1.300013, 987.5411, 736.3838                            00001260
+$$                                                                      00001270
+$$      Element PT_2                                                    00001280
+$$      ------------                                                    00001290
+E1P2 = POINT /  2.313000, 0.05411300, -2.383800                         00001300
+$$                                                                      00001310
+$$      Element PT_3                                                    00001320
+$$      ------------                                                    00001330
+E1P3 = POINT /  3.313000, -21.54113, -2.383800                          00001340
+$$                                                                      00001350
+S1 = ENDSET                                                             00001360
+$$                                                                      00001370
+DSTSWISS = END                                                          00001380

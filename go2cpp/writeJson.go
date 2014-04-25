@@ -12,7 +12,8 @@ type MovePlaneCommand struct {
 }
 
 type RunJobCommand struct {
-	JobNo int
+	JobNo    int
+	FileName string
 }
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	err = enc.Encode(MovePlaneCommand{10, 20, 5, 2.5})
 	checkErr(err)
 
-	err = enc.Encode(RunJobCommand{502})
+	err = enc.Encode(RunJobCommand{502, "scan1.xyz"})
 	checkErr(err)
 
 	time.Sleep(time.Second * 3)
@@ -31,7 +32,7 @@ func main() {
 	err = enc.Encode(MovePlaneCommand{0, 25, -5, 10})
 	checkErr(err)
 
-	err = enc.Encode(RunJobCommand{505})
+	err = enc.Encode(RunJobCommand{505, "scan2.xyz"})
 	checkErr(err)
 
 	time.Sleep(time.Second * 3)

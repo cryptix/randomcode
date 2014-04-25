@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 	// cast me plenty
 	void *arg;
 	RunJobArg *rjArg;
-	MovePlaneArg *mpArg;
+	MoveToArg *mpArg;
 
 	while(std::cin.good()) {
 		try {
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
 		switch(c) {
 			case MovePlane:
-				mpArg = (MovePlaneArg *) arg;
+				mpArg = (MoveToArg *) arg;
 				/*
 				std::cout << "MovePlane" << std::endl;
 				std::cout << "y<" << mpArg->y << ">";

@@ -10,16 +10,25 @@ import (
 	"time"
 )
 
-type MovePlaneCommand struct {
+const cmdPath = "/Users/cryptix/Documents/DST-Swiss/TIS/Cpp/JsonRunner/Debug/JsonRunner"
+
+type RpcRequest struct {
+	ReqId int
+}
+
+type MoveToCommand struct {
+	RpcRequest
 	Y, Z        float64
 	Alpha, Beta float64
 }
 
 type RunJobCommand struct {
-	JobNo int
+	RpcRequest
+	FileName string
+	JobNo    int
 }
 
-type Reply struct {
+type Response struct {
 	Message string
 }
 
@@ -29,7 +38,7 @@ func main() {
 		running bool
 	)
 
-	cmd := exec.Command("receiv/CommandParser")
+	cmd := exec.Command(cmdPath)
 
 	stdout, err := cmd.StdoutPipe()
 	checkErr(err)
@@ -44,18 +53,18 @@ func main() {
 	go func() {
 		enc := json.NewEncoder(stdin)
 
-		err = enc.Encode(MovePlaneCommand{10, 20, 5, 2.5})
+		err = enc.Encode(MoveToCommand{10, 20, 5, 2.5})
 		checkErr(err)
 
-		err = enc.Encode(RunJobCommand{502})
+		err = enc.Encode(RunJobCommand{"502.xyz", 502})
 		checkErr(err)
 
 		time.Sleep(time.Second * 3)
 
-		err = enc.Encode(MovePlaneCommand{0, 25, -5, 10})
+		err = enc.Encode(MoveToCommand{0, 25, -5, 10})
 		checkErr(err)
 
-		err = enc.Encode(RunJobCommand{505})
+		err = enc.Encode(RunJobCommand{"505.xyz", 505})
 		checkErr(err)
 
 		time.Sleep(time.Second * 3)

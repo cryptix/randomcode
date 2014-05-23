@@ -23,6 +23,7 @@ do
 #     }
 #   } '`
 
-  xsetroot -name "load[$_load] free[${_mem}m] date[$_date]"
+  # xsetroot -name "load[$_load] free[${_mem}m] date[$_date]"
+  echo "load[$_load] free[${_mem}m] date[$_date]"
   sleep 10
 done

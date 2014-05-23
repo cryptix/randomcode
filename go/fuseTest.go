@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
@@ -22,6 +23,24 @@ var (
 	files    map[string]*File
 )
 
+func NewFile(name string, content []byte) *File {
+	id := <-newInode
+	now := time.Now()
+	return &File{
+		name:    name,
+		content: content,
+		Fattr: fuse.Attr{
+			Inode: id,
+			Mode:  0444,
+			Size:  uint64(len(content)),
+			Ctime: now,
+			Atime: now,
+			Mtime: now,
+		},
+		Dirent: fuse.Dirent{Inode: id, Name: name, Type: fuse.DT_File},
+	}
+}
+
 func main() {
 	// parse flags
 	flag.Usage = Usage
@@ -34,9 +53,9 @@ func main() {
 	mountpoint := flag.Arg(0)
 
 	// init inode generator
-	newInode := make(chan uint64)
+	newInode = make(chan uint64)
 	go func() {
-		var counter uint64 = 0
+		var counter uint64 = 2 // start with 2, 1 is dir root
 		for {
 			newInode <- counter
 			counter += 1
@@ -45,17 +64,8 @@ func main() {
 
 	files = make(map[string]*File)
 
-	files["hello"] = &File{
-		name:    "hello",
-		content: []byte("Hello, world!\n"),
-		Dirent:  fuse.Dirent{Inode: 2, Name: "hello", Type: fuse.DT_File},
-	}
-
-	files["lulz"] = &File{
-		name:    "lulz",
-		content: []byte("some lulz!\n"),
-		Dirent:  fuse.Dirent{Inode: 3, Name: "lulz", Type: fuse.DT_File},
-	}
+	files["hello"] = NewFile("hello", []byte("Hello, world!\n"))
+	files["lulz.sh"] = NewFile("lulz.sh", []byte("#!/bin/bash\necho lulz\n"))
 
 	// startup mount
 	c, err := fuse.Mount(mountpoint)
@@ -118,14 +128,38 @@ func (Dir) ReadDir(intr fs.Intr) ([]fuse.Dirent, fuse.Error) {
 }
 
 func (d Dir) Create(req *fuse.CreateRequest, resp *fuse.CreateResponse, intr fs.Intr) (fs.Node, fs.Handle, fuse.Error) {
-	fmt.Printf("Create Req for %s: %+v\n", d.name, req)
-	return nil, nil, fuse.ENOENT
+	fmt.Println("Create Req on:", d.name)
+	fmt.Printf("Req: %+v\n", req)
+
+	_, exists := files[req.Name]
+	if exists == true {
+		req.RespondError(fuse.EPERM)
+		return nil, nil, fuse.EPERM
+	}
+
+	newFile := NewFile(req.Name, []byte(""))
+	newFile.Fattr.Mode = req.Mode
+	fmt.Printf("New File: %+v\n", newFile)
+	files[req.Name] = newFile
+
+	// dont know yet what the response is for
+	// works without..
+
+	// resp.Attr = newFile.Fattr
+	// resp.AttrValid = time.Minute * 1
+	// resp.EntryValid = time.Minute * 1
+
+	// fmt.Printf("Resp: %+v\n", resp)
+	// req.Respond(resp)
+
+	return newFile, newFile, nil
 }
 
 // File implements both Node and Handle for the hello file.
 type File struct {
 	fs.NodeRef
 	Dirent fuse.Dirent
+	Fattr  fuse.Attr
 
 	content []byte
 	name    string
@@ -133,14 +167,13 @@ type File struct {
 
 func (f File) Attr() fuse.Attr {
 	fmt.Println("Attr() for:", f.name)
-	switch f.name {
-	case "lulz":
-		return fuse.Attr{Inode: files[f.name].Dirent.Inode, Mode: 0444}
-	case "hello":
-		return fuse.Attr{Inode: files[f.name].Dirent.Inode, Mode: 0555}
+
+	file, found := files[f.name]
+	if !found {
+		return fuse.Attr{}
 	}
 
-	return fuse.Attr{}
+	return file.Fattr
 }
 
 // func (f File) Open(req *fuse.OpenRequest, resp *fuse.OpenResponse, intr fs.Intr) (fs.Handle, fuse.Error) {

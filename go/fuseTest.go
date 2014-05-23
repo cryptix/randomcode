@@ -17,9 +17,13 @@ var Usage = func() {
 	flag.PrintDefaults()
 }
 
-var newInode chan uint64
+var (
+	newInode chan uint64
+	files    map[string]*File
+)
 
 func main() {
+	// parse flags
 	flag.Usage = Usage
 	flag.Parse()
 
@@ -29,6 +33,7 @@ func main() {
 	}
 	mountpoint := flag.Arg(0)
 
+	// init inode generator
 	newInode := make(chan uint64)
 	go func() {
 		var counter uint64 = 0
@@ -38,6 +43,21 @@ func main() {
 		}
 	}()
 
+	files = make(map[string]*File)
+
+	files["hello"] = &File{
+		name:    "hello",
+		content: []byte("Hello, world!\n"),
+		Dirent:  fuse.Dirent{Inode: 2, Name: "hello", Type: fuse.DT_File},
+	}
+
+	files["lulz"] = &File{
+		name:    "lulz",
+		content: []byte("some lulz!\n"),
+		Dirent:  fuse.Dirent{Inode: 3, Name: "lulz", Type: fuse.DT_File},
+	}
+
+	// startup mount
 	c, err := fuse.Mount(mountpoint)
 	if err != nil {
 		log.Fatal(err)
@@ -86,17 +106,12 @@ func (Dir) Lookup(name string, intr fs.Intr) (fs.Node, fuse.Error) {
 	return File{name: name}, nil
 }
 
-var files = map[string]fuse.Dirent{
-	"hello": {Inode: 2, Name: "hello", Type: fuse.DT_File},
-	"lulz":  {Inode: 3, Name: "lulz", Type: fuse.DT_File},
-}
-
 func (Dir) ReadDir(intr fs.Intr) ([]fuse.Dirent, fuse.Error) {
 	fmt.Println("Returning Dir entries")
 
 	ents := make([]fuse.Dirent, 0, len(files))
 	for _, v := range files {
-		ents = append(ents, v)
+		ents = append(ents, v.Dirent)
 	}
 
 	return ents, nil
@@ -110,16 +125,19 @@ func (d Dir) Create(req *fuse.CreateRequest, resp *fuse.CreateResponse, intr fs.
 // File implements both Node and Handle for the hello file.
 type File struct {
 	fs.NodeRef
-	name string
+	Dirent fuse.Dirent
+
+	content []byte
+	name    string
 }
 
 func (f File) Attr() fuse.Attr {
 	fmt.Println("Attr() for:", f.name)
 	switch f.name {
 	case "lulz":
-		return fuse.Attr{Inode: files[f.name].Inode, Mode: 0444}
+		return fuse.Attr{Inode: files[f.name].Dirent.Inode, Mode: 0444}
 	case "hello":
-		return fuse.Attr{Inode: files[f.name].Inode, Mode: 0555}
+		return fuse.Attr{Inode: files[f.name].Dirent.Inode, Mode: 0555}
 	}
 
 	return fuse.Attr{}
@@ -132,5 +150,7 @@ func (f File) Attr() fuse.Attr {
 
 func (f File) ReadAll(intr fs.Intr) ([]byte, fuse.Error) {
 	fmt.Println("ReadAll for:", f.name)
-	return []byte("hello, world\n"), nil
+	// files[f.name].content - works
+	// f.content -doesn't, why?
+	return files[f.name].content, nil
 }

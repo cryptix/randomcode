@@ -18,7 +18,7 @@ type Page struct {
 }
 
 func (p *Page) save() error {
-	// TODO p.Title could be ../../../../../.bashrc :/ 
+	// TODO p.Title could be ../../../../../.bashrc :/
 	// path.basename()?
 	filename := p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
@@ -58,7 +58,7 @@ func viewHandler(rw http.ResponseWriter, req *http.Request, title string) {
 		http.Redirect(rw, req, editPath+title, http.StatusFound)
 		return
 	}
-	renderTemplae(rw, "view", p)
+	renderTemplate(rw, "view", p)
 }
 
 func editHandler(rw http.ResponseWriter, req *http.Request, title string) {
@@ -66,7 +66,7 @@ func editHandler(rw http.ResponseWriter, req *http.Request, title string) {
 	if err != nil {
 		p = &Page{Title: title}
 	}
-	renderTemplae(rw, "edit", p)
+	renderTemplate(rw, "edit", p)
 }
 
 func saveHandler(rw http.ResponseWriter, req *http.Request, title string) {
@@ -80,7 +80,7 @@ func saveHandler(rw http.ResponseWriter, req *http.Request, title string) {
 	http.Redirect(rw, req, viewPath+title, http.StatusFound)
 }
 
-func renderTemplae(rw http.ResponseWriter, tmpl string, p *Page) {
+func renderTemplate(rw http.ResponseWriter, tmpl string, p *Page) {
 	err := templates.ExecuteTemplate(rw, tmpl+".tpl", p)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)

@@ -74,7 +74,7 @@ func main() {
 	}
 	defer c.Close()
 
-	fmt.Println("Serving ", mountpoint)
+	log.Println("Serving ", mountpoint)
 	err = fs.Serve(c, FS{})
 	if err != nil {
 		log.Fatal(err)
@@ -91,7 +91,7 @@ func main() {
 type FS struct{}
 
 func (FS) Root() (fs.Node, fuse.Error) {
-	fmt.Println("returning root node")
+	log.Println("returning root node")
 	return Dir{"Root"}, nil
 }
 
@@ -101,12 +101,12 @@ type Dir struct {
 }
 
 func (Dir) Attr() fuse.Attr {
-	fmt.Println("Attr lookup")
+	log.Println("Attr lookup")
 	return fuse.Attr{Inode: 1, Mode: os.ModeDir | 0555}
 }
 
 func (Dir) Lookup(name string, intr fs.Intr) (fs.Node, fuse.Error) {
-	fmt.Println("Name lookup:", name)
+	log.Println("Name lookup:", name)
 	_, ok := files[name]
 	if !ok {
 		return nil, fuse.ENOENT
@@ -117,7 +117,7 @@ func (Dir) Lookup(name string, intr fs.Intr) (fs.Node, fuse.Error) {
 }
 
 func (Dir) ReadDir(intr fs.Intr) ([]fuse.Dirent, fuse.Error) {
-	fmt.Println("Returning Dir entries")
+	log.Println("Returning Dir entries")
 
 	ents := make([]fuse.Dirent, 0, len(files))
 	for _, v := range files {
@@ -128,8 +128,8 @@ func (Dir) ReadDir(intr fs.Intr) ([]fuse.Dirent, fuse.Error) {
 }
 
 func (d Dir) Create(req *fuse.CreateRequest, resp *fuse.CreateResponse, intr fs.Intr) (fs.Node, fs.Handle, fuse.Error) {
-	fmt.Println("Create Req on:", d.name)
-	fmt.Printf("Req: %+v\n", req)
+	log.Println("Create Req on:", d.name)
+	log.Printf("Req: %+v\n", req)
 
 	_, exists := files[req.Name]
 	if exists == true {
@@ -139,7 +139,7 @@ func (d Dir) Create(req *fuse.CreateRequest, resp *fuse.CreateResponse, intr fs.
 
 	newFile := NewFile(req.Name, []byte(""))
 	newFile.Fattr.Mode = req.Mode
-	fmt.Printf("New File: %+v\n", newFile)
+	log.Printf("New File: %+v\n", newFile)
 	files[req.Name] = newFile
 
 	// dont know yet what the response is for
@@ -149,7 +149,7 @@ func (d Dir) Create(req *fuse.CreateRequest, resp *fuse.CreateResponse, intr fs.
 	// resp.AttrValid = time.Minute * 1
 	// resp.EntryValid = time.Minute * 1
 
-	// fmt.Printf("Resp: %+v\n", resp)
+	// log.Printf("Resp: %+v\n", resp)
 	// req.Respond(resp)
 
 	return newFile, newFile, nil
@@ -166,7 +166,7 @@ type File struct {
 }
 
 func (f File) Attr() fuse.Attr {
-	fmt.Println("Attr() for:", f.name)
+	log.Println("Attr() for:", f.name)
 
 	file, found := files[f.name]
 	if !found {
@@ -177,12 +177,12 @@ func (f File) Attr() fuse.Attr {
 }
 
 // func (f File) Open(req *fuse.OpenRequest, resp *fuse.OpenResponse, intr fs.Intr) (fs.Handle, fuse.Error) {
-// 	fmt.Printf("Open Req for %s: %+v\n", f.name, req)
+// 	log.Printf("Open Req for %s: %+v\n", f.name, req)
 // 	return nil, fuse.ENOENT
 // }
 
 func (f File) ReadAll(intr fs.Intr) ([]byte, fuse.Error) {
-	fmt.Println("ReadAll for:", f.name)
+	log.Println("ReadAll for:", f.name)
 	// files[f.name].content - works
 	// f.content -doesn't, why?
 	return files[f.name].content, nil

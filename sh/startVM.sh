@@ -20,9 +20,9 @@ cat << EOF
 5) WinXP - Testing
 6) Linux - kali
 7) Linux - Arch 32bit
-8) Linux - CentOS
+8) Linux - Arch 64bit
 9) FreeBSD 10
-10) Docker1
+10) OpenBSD
 EOF
 
 read vmSel
@@ -32,23 +32,26 @@ ram=$((4*1024))
 rootDrive=/dev/null
 extraArgs=""
 netConfig="-net nic,model=virtio -net bridge,br=br0"
+spicePort=$(( 5930 + $(pgrep spicec | wc -l) ))
 
 case $vmSel in
 	1)
 		rootDrive=/dev/zvol/zdata/Win7DST
+		extraArgs="-usb -device usb-host,vendorid=0x4b9,productid=0x300"
 		# extraMedia="-drive file=/mnt/play/Downloads/mu_visual_studio_2010_sp1_x86_dvd_651704.iso,media=cdrom"
 		;;
-	
+
 	2)
 		rootDrive=/dev/zvol/zdata/Win7Xilinx
-		extraArgs="-usb -device usb-host,vendorid=0x1443,productid=0x0007"
+		extraArgs="-usb -device usb-host,vendorid=0x10c4,productid=0xea60 -device usb-host,vendorid=0x1443,productid=0x0007"
 		;;
 
 	3)
 		rootDrive=/dev/zvol/zdata/Win7
 		extraArgs="-usb -device usb-host,vendorid=0x4b9,productid=0x300"
+		extraMedia="-drive file=/mnt/play/isos/virtio-win-0.1-74.iso,media=cdrom"
 		;;
-	
+
 	4)
 		rootDrive=/dev/zvol/zdata/Win81Test
 		netConfig="-net none"
@@ -68,7 +71,8 @@ case $vmSel in
 		;;
 
 	8)
-		rootDrive=/dev/zvol/zdata/CentOSVM
+		rootDrive=/dev/zvol/zdata/LinuxArchx64
+		#extraMedia="-drive file=/mnt/play/isos/archlinux-2014.04.01-dual.iso,media=cdrom"
 		;;
 
 	9)
@@ -76,8 +80,8 @@ case $vmSel in
 		;;
 
 	10)
-		rootDrive=/dev/zvol/zdata/DockerVM1
-		extraMedia="-drive file=/mnt/play/boot2docker.iso,media=cdrom -boot d"
+		rootDrive=/dev/zvol/zdata/openBSD
+		extraMedia="-drive file=/mnt/play/isos/openBSD.5.5.iso,media=cdrom"
 		;;
 esac
 
@@ -87,10 +91,10 @@ if [[ $is32bit -eq 1 ]]; then
 	echo "Running 32bit mode."
 	guestArch=qemu-system-i386
 fi
-	
 
-echo "Booting VM..."
-exec $guestArch \
+
+echo "Booting VM... Spicec Port: $spicePort"
+$guestArch \
 	-drive file=$rootDrive,cache=none,if=virtio \
 	$extraMedia \
 	-m $ram \
@@ -99,8 +103,9 @@ exec $guestArch \
 	-enable-kvm \
 	$netConfig \
 	-vga qxl \
-	-spice port=5930,disable-ticketing \
+	-spice port=$spicePort,disable-ticketing \
 	-device virtio-serial-pci \
 	-device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
 	-chardev spicevmc,id=spicechannel0,name=vdagent \
-	$extraArgs
+	$extraArgs &
+ spicec -h localhost -p $spicePort

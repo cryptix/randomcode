@@ -9,17 +9,7 @@ import (
 	"os/exec"
 )
 
-const cmdPath = "/Users/cryptix/Documents/DST-Swiss/TIS/Cpp/JsonRunner/Debug/JsonRunner"
-
-type MoveToArgs struct {
-	Y, Z        float64
-	Alpha, Beta float64
-}
-
-type ScanJobArgs struct {
-	FileName string
-	JobNo    int
-}
+const cmdPath = "/home/cryptix/DST-Code/TIS-Cpp/JsonRunner/JsonRunner"
 
 type stdioConn struct {
 	stdout io.ReadCloser
@@ -41,12 +31,12 @@ func (s stdioConn) Close() (err error) {
 
 func (s stdioConn) Read(p []byte) (n int, err error) {
 	n, err = s.stdout.Read(p)
-	fmt.Printf("Reading from stdout:%s", string(p))
+	fmt.Printf("Reading from stdout:%s\n", string(p))
 	return
 }
 
 func (s stdioConn) Write(p []byte) (n int, err error) {
-	fmt.Printf("Writing to stdin:%s", string(p))
+	fmt.Printf("Writing to stdin:%s\n", string(p))
 	return s.stdin.Write(p)
 }
 
@@ -92,12 +82,14 @@ func main() {
 	mtArg := MoveToArgs{10, 20, 0.5, -0.25}
 	var reply interface{}
 
-	err = client.Call("MoveTo", mtArg, &reply)
+	// call 1
+	err = client.Call("Plane.MoveTo", mtArg, &reply)
 	checkErr(err)
 	fmt.Println("MoveTo Reply:", reply)
 
+	// call 2
 	sjArg := ScanJobArgs{"scan1.xyz", 501}
-	err = client.Call("ScanJob", sjArg, &reply)
+	err = client.Call("Laser.ScanJob", sjArg, &reply)
 	checkErr(err)
 	fmt.Println("ScanJob Reply:", reply)
 }

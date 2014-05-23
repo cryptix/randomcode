@@ -1,45 +1,40 @@
 package main
 
 import (
-	"bufio"
-	"github.com/cryptix/goSam"
 	"io"
 	"log"
+	"net/http"
 	"os"
+
+	"github.com/cryptix/goSam"
 )
 
 func main() {
+	// create a default sam client
 	sam, err := goSam.NewDefaultClient()
 	checkErr(err)
 
 	log.Println("Client Created")
 
-	err = sam.Hello()
+	tr := &http.Transport{
+		Dial: sam.Dial,
+	}
+
+	client := &http.Client{Transport: tr}
+	resp, err := client.Get("http://stats.i2p/")
+	checkErr(err)
+	defer resp.Body.Close()
+
+	log.Printf("Get returned %+v\n", resp)
+
+	file, err := os.Create("stats.html")
+	checkErr(err)
+	defer file.Close()
+
+	_, err = io.Copy(file, resp.Body)
 	checkErr(err)
 
-	log.Println("Hello OK")
-
-	// tr := &http.Transport{
-	// 	Dial: sam.Dial,
-	// }
-
-	conn, err := sam.Dial("tcp", "zzz.i2p:80")
-	checkErr(err)
-
-	go io.Copy(os.Stdout, conn)
-	buffedWriter := bufio.NewWriter(conn)
-
-	_, err = buffedWriter.WriteString("GET / HTTP/1.1\r\n\r\n")
-	checkErr(err)
-
-	err = buffedWriter.Flush()
-	checkErr(err)
-
-	// client := &http.Client{Transport: tr}
-	// resp, err := client.Get("http://stats.i2p/")
-	// log.Println("Get returned", resp)
-	// checkErr(err)
-
+	log.Println("Done.")
 }
 
 func checkErr(err error) {

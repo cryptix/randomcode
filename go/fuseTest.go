@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"bazil.org/fuse"
@@ -176,14 +177,37 @@ func (f File) Attr() fuse.Attr {
 	return file.Fattr
 }
 
-// func (f File) Open(req *fuse.OpenRequest, resp *fuse.OpenResponse, intr fs.Intr) (fs.Handle, fuse.Error) {
-// 	log.Printf("Open Req for %s: %+v\n", f.name, req)
-// 	return nil, fuse.ENOENT
-// }
+// stolen shamelessly from camlistore
+func (fHandle File) Read(req *fuse.ReadRequest, res *fuse.ReadResponse, intr fs.Intr) fuse.Error {
+	log.Printf("File READ on %v: %#v", fHandle.name, req)
+	f, ok := files[fHandle.name]
+	if !ok {
+		return fuse.EIO
+	}
 
-func (f File) ReadAll(intr fs.Intr) ([]byte, fuse.Error) {
-	log.Println("ReadAll for:", f.name)
-	// files[f.name].content - works
-	// f.content -doesn't, why?
-	return files[f.name].content, nil
+	contentLen := int64(len(f.content))
+	if req.Offset >= contentLen {
+		return nil
+	}
+
+	size := req.Size
+	if int64(size)+req.Offset >= contentLen {
+		size -= int((int64(size) + req.Offset) - contentLen)
+	}
+
+	res.Data = f.content[req.Offset:size]
+	return nil
+}
+
+func (fHandle File) Write(req *fuse.WriteRequest, resp *fuse.WriteResponse, intr fs.Intr) fuse.Error {
+	log.Println("File Write on", fHandle.name)
+	log.Printf("Req: %+v\n", req)
+	log.Println("Offset:", req.Offset)
+	log.Println("Data:", string(req.Data))
+	f, ok := files[fHandle.name]
+	if !ok {
+		return fuse.EIO
+	}
+
+	return fuse.EIO
 }

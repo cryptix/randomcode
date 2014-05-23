@@ -13,9 +13,9 @@ fi
 	if stest -dqr -n "$cache" $PATH; then
 		stest -flx $PATH | sort -u > "$cache"
 	fi
-) 
+)
 
-choice=`awk -F'"' '/"\)/{print $2}' ~/bin/terMenu.sh | dmenu -p 'start:'`
+choice=`awk -F'"' '/"\)/{print $2}' /usr/local/bin/terMenu.sh | dmenu -p 'start:'`
 case $choice  in
   "open")
     pids=$(pgrep zsh)

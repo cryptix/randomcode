@@ -1,0 +1,46 @@
+#chart1 div {
+  font: 10px sans-serif;
+  background-color: steelblue;
+  text-align: right;
+  padding: 3px;
+  margin: 1px;
+  color: white;
+}
+
+
+#chart3 > g > rect,
+#chart2 > g > rect {
+  fill: steelblue;
+}
+
+#chart3 > g > text,
+#chart2 > g > text {
+  fill: white;
+  font: 10px sans-serif;
+  text-anchor: end;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+#chart3 > g > rect:hover,
+#chart2 > g > rect:hover,
+.bar:hover {
+  fill: purple;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}

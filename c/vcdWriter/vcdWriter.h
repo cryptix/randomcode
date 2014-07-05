@@ -3,10 +3,6 @@ helpers for converting data from the pshdl sim
 into a VCD format understood by GTKWave
 
 inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
-
-
-TODO:
-- compare signals to previous tick to reduce size of output
 */
 
 #include <stdio.h>
@@ -30,6 +26,7 @@ typedef struct signal {
     char symbol;
     char name[NAMELEN];
     size_t width;
+    uint64_t previous; // previous value
 
     struct signal *next, *prev;
 } signal;
@@ -141,13 +138,18 @@ void vcdWriteHeader(vcdWriter *w)
 void vcdTick(vcdWriter *w)
 {
 	signal *sig;
+	uint64_t val;
 
 	// the timestamp
 	fprintf(w->fp, "#%u\n", (w->tickCount)++);
 
 	// the list of signals
 	LL_FOREACH(w->head, sig) {
-		fprintf(w->fp, "b%s %c\n", int2bin(pshdl_sim_getOutput(sig->idx), sig->width), sig->symbol);
+		val = pshdl_sim_getOutput(sig->idx);
+		if (val != sig->previous) {
+			fprintf(w->fp, "b%s %c\n", int2bin(val, sig->width), sig->symbol);
+			sig->previous = val;
+		}
 	}
 
 }

@@ -24,7 +24,8 @@ typedef struct signal {
     char symbol;
     char name[NAMELEN];
     size_t width;
-    uint64_t previous; // previous value
+    // current and last values
+    uint64_t now, last;
 } signal;
 
 // vcdWriter
@@ -149,25 +150,50 @@ void vcdWriteHeader(vcdWriter *w)
 
 	fprintf(w->fp, "$upscope $end\n");
 	fprintf(w->fp, "$enddefinitions $end\n");
+
+	// print initial values
+	fprintf(w->fp, "#0\n");
+	for (int i = 0; i < w->listLen; ++i)
+	{
+		sig = w->list[i];
+		sig->now = pshdl_sim_getOutput(sig->idx);
+		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
+	}
 }
 
 void vcdTick(vcdWriter *w)
 {
 	signal *sig;
-	uint64_t val;
 
-	// the timestamp
-	fprintf(w->fp, "#%u\n", (w->tickCount)++);
+	signal *changed[w->listMax];
+	size_t changedCnt=0;
 
-	// the list of signals
+	w->tickCount++;
+
+	// get new values of all signals
 	for (int i = 0; i < w->listLen; ++i)
 	{
 		sig = w->list[i];
-		val = pshdl_sim_getOutput(sig->idx);
-		if (val != sig->previous) {
-			fprintf(w->fp, "b%s %c\n", int2bin(val, sig->width), sig->symbol);
-			sig->previous = val;
+		sig->now = pshdl_sim_getOutput(sig->idx);
+		if (sig->now != sig->last) {
+			sig->last = sig->now;
+			changed[changedCnt++]=sig;
 		}
+	}
+
+	// if no value changed
+	if (changedCnt == 0) {
+		return;
+	}
+
+	// current timestamp
+	fprintf(w->fp, "#%u\n", w->tickCount);
+
+	// output values
+	for (int i = 0; i < changedCnt; ++i)
+	{
+		sig = changed[i];
+		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
 
 }

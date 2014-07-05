@@ -14,63 +14,63 @@ inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
 #include <stdint.h>
 
 
-// declarations
-#define NAMELEN 128
+#define NAMELEN 128 // max signal name length
 
+// =================
+// type declarations
 
-// list element of signals
+// signal represents a simualted signal
 typedef struct signal {
-    int idx; // simulation index
-    char symbol;
-    char name[NAMELEN];
-    size_t width;
-    // current and last values
-    uint64_t now, last;
+    int idx;			// simulation index
+    char symbol;		// char used inside vcd file
+    char name[NAMELEN]; // name of the signal
+    size_t width;		// amount of bits for this signal
+    uint64_t now, last; // current and previous values
 } signal;
 
 // vcdWriter
 typedef struct vcdWriter {
-	FILE *fp; // file to write to
+	FILE *fp; 			// file to write to
 
 	int symbolCount; 	// number of signals tracked
 	uint32_t tickCount; // tick counter
 
-	signal **list; // list of signals to track
-	size_t listLen;
-	size_t listMax;
+	signal **list;		// list of signals to track
+	size_t listLen;		// current number of signals
+	size_t listMax;		// maximum number of signals
 } vcdWriter;
 
+
+// =====================
 // function declarations
+
 
 // creates a new  vcd file (named fname)
 // returns a pointer to a vcdWriter struct to use for further interaction
 // n is the ammount of signals to track
 static vcdWriter* vcdCreateWriter(const char *fname, size_t n);
 
-// registers a signal onto the vcdWriter
+// registers a signal on the vcdWriter
 // these are then polled on every vcdTick call
 void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t width);
 
-// writes the header, register your signals before
+// writes the vcd header, register your signals before
 void vcdWriteHeader(vcdWriter *w);
 
-// poll all registerd signals for their values
-// and write them to file
+// poll all registerd signals for their values and write them to file
 void vcdTick(vcdWriter *w);
 
 // close the output file
 void vcdCloseWriter(vcdWriter *w);
 
-
-// signature of getOutput function
-uint64_t pshdl_sim_getOutput(int idx, ...);
-
 // helpers
+uint64_t pshdl_sim_getOutput(int idx, ...); // signature of sim function
 static char * timeStamp();
 char * int2bin(uint64_t i, size_t bits);
 
-// definitions
+
 // ===========
+// definitions
 
 static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
 {
@@ -105,11 +105,13 @@ static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
 
 void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t width)
 {
+	// check list limit
 	if (w->listLen == w->listMax) {
 		fprintf(stderr, "VCDWriter Error: cant register signal %s. Limit reached!\n", name);
 		exit(-1);
 	}
 
+	// allocate new signal
 	signal *newSig = malloc(sizeof(*newSig));
 	if (newSig == NULL) {
 		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal %s!\n", name);
@@ -133,7 +135,7 @@ void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t wi
 
 void vcdWriteHeader(vcdWriter *w)
 {
-	signal *sig;
+	signal *sig = w->list[0];
 
 	// static header data
 	fprintf(w->fp, "$date %s $end\n", timeStamp());
@@ -142,9 +144,8 @@ void vcdWriteHeader(vcdWriter *w)
 	fprintf(w->fp, "$scope module top $end\n");
 
 	// iterate over registerd signals
-	for (int i = 0; i < w->listLen; ++i)
+	for (int i = 0; i < w->listLen; sig = w->list[i++])
 	{
-		sig = w->list[i];
 		fprintf(w->fp, "$var wire %zu %c %s $end\n", sig->width, sig->symbol, sig->name);
 	}
 
@@ -153,9 +154,8 @@ void vcdWriteHeader(vcdWriter *w)
 
 	// print initial values
 	fprintf(w->fp, "#0\n");
-	for (int i = 0; i < w->listLen; ++i)
+	for (int i = 0; i < w->listLen; sig = w->list[i++])
 	{
-		sig = w->list[i];
 		sig->now = pshdl_sim_getOutput(sig->idx);
 		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
@@ -163,17 +163,18 @@ void vcdWriteHeader(vcdWriter *w)
 
 void vcdTick(vcdWriter *w)
 {
-	signal *sig;
+	signal *sig = w->list[0];
 
+	// list of changed signals
 	signal *changed[w->listMax];
 	size_t changedCnt=0;
 
+	// increase timestamp counter
 	w->tickCount++;
 
 	// get new values of all signals
-	for (int i = 0; i < w->listLen; ++i)
+	for (int i = 0; i < w->listLen; sig = w->list[i++])
 	{
-		sig = w->list[i];
 		sig->now = pshdl_sim_getOutput(sig->idx);
 		if (sig->now != sig->last) {
 			sig->last = sig->now;
@@ -189,10 +190,10 @@ void vcdTick(vcdWriter *w)
 	// current timestamp
 	fprintf(w->fp, "#%u\n", w->tickCount);
 
-	// output values
-	for (int i = 0; i < changedCnt; ++i)
+	// output changed values
+	sig = changed[0];
+	for (int i = 0; i < changedCnt; sig = changed[i++])
 	{
-		sig = changed[i];
 		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
 

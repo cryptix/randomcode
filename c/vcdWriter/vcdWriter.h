@@ -13,7 +13,7 @@ inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
 #include <sys/time.h>
 #include <stdint.h>
 
-
+#define MAXSIGNALS 128
 #define NAMELEN 128 // max signal name length
 
 // =================
@@ -37,7 +37,6 @@ typedef struct vcdWriter {
 
 	signal **list;		// list of signals to track
 	size_t listLen;		// current number of signals
-	size_t listMax;		// maximum number of signals
 } vcdWriter;
 
 
@@ -47,8 +46,7 @@ typedef struct vcdWriter {
 
 // creates a new  vcd file (named fname)
 // returns a pointer to a vcdWriter struct to use for further interaction
-// n is the ammount of signals to track
-static vcdWriter* vcdCreateWriter(const char *fname, size_t n);
+static vcdWriter* vcdCreateWriter(const char *fname);
 
 // registers a signal on the vcdWriter
 // these are then polled on every vcdTick call
@@ -72,7 +70,7 @@ char * int2bin(uint64_t i, size_t bits);
 // ===========
 // definitions
 
-static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
+static vcdWriter* vcdCreateWriter(const char *fname)
 {
 	vcdWriter *w = malloc(sizeof(*w));
 	if (w == NULL) {
@@ -88,14 +86,13 @@ static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
 	}
 
 	// init list
-	w->list = calloc(n, sizeof(signal));
+	w->list = calloc(MAXSIGNALS, sizeof(signal));
 	if (w->list == NULL) {
 		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal list!\n");
 		exit(-1);
 	}
 
 	w->listLen = 0;
-	w->listMax = n;
 
 	w->symbolCount = '!';
 	w->tickCount = 0;
@@ -106,7 +103,7 @@ static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
 void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t width)
 {
 	// check list limit
-	if (w->listLen == w->listMax) {
+	if (w->listLen == MAXSIGNALS) {
 		fprintf(stderr, "VCDWriter Error: cant register signal %s. Limit reached!\n", name);
 		exit(-1);
 	}
@@ -166,7 +163,7 @@ void vcdTick(vcdWriter *w)
 	signal *sig = w->list[0];
 
 	// list of changed signals
-	signal *changed[w->listMax];
+	signal *changed[w->listLen];
 	size_t changedCnt=0;
 
 	// increase timestamp counter

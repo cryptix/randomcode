@@ -4,12 +4,18 @@
 size_t callCnt=0;
 uint64_t pshdl_sim_getOutput(int idx, ...)
 {
-	return 42*idx+ (callCnt++);
+	uint64_t res = 42*idx+ (callCnt++);
+
+	if (idx == 1) {
+		res = 23;
+	}
+		return res;
 }
+
 
 int main(int argc, char const *argv[])
 {
-	vcdWriter *w = vcdCreateWriter("test.vcd");
+	vcdWriter *w = vcdCreateWriter("test.vcd",4);
 
 
 

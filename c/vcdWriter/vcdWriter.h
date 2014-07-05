@@ -13,8 +13,6 @@ inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
 #include <sys/time.h>
 #include <stdint.h>
 
-#include "utlist.h" // http://troydhanson.github.io/uthash/utlist.html
-
 
 // declarations
 #define NAMELEN 128
@@ -27,8 +25,6 @@ typedef struct signal {
     char name[NAMELEN];
     size_t width;
     uint64_t previous; // previous value
-
-    struct signal *next, *prev;
 } signal;
 
 // vcdWriter
@@ -38,14 +34,17 @@ typedef struct vcdWriter {
 	int symbolCount; 	// number of signals tracked
 	uint32_t tickCount; // tick counter
 
-	signal *head; // list of signals to track
+	signal **list; // list of signals to track
+	size_t listLen;
+	size_t listMax;
 } vcdWriter;
 
 // function declarations
 
 // creates a new  vcd file (named fname)
 // returns a pointer to a vcdWriter struct to use for further interaction
-static vcdWriter* vcdCreateWriter(const char *fname);
+// n is the ammount of signals to track
+static vcdWriter* vcdCreateWriter(const char *fname, size_t n);
 
 // registers a signal onto the vcdWriter
 // these are then polled on every vcdTick call
@@ -72,20 +71,30 @@ char * int2bin(uint64_t i, size_t bits);
 // definitions
 // ===========
 
-static vcdWriter* vcdCreateWriter(const char *fname)
+static vcdWriter* vcdCreateWriter(const char *fname, size_t n)
 {
 	vcdWriter *w = malloc(sizeof(*w));
-
+	if (w == NULL) {
+		fprintf(stderr, "VCDWriter Error: couldn't allocate space for vcdWriter!\n");
+		exit(-1);
+	}
 
 	// open file
 	if ((w->fp = fopen(fname, "w")) == NULL)
 	{
 		fprintf(stderr, "VCDWriter Error: Can't open output file %s!\n", fname);
-		exit(1);
+		exit(-2);
 	}
 
 	// init list
-	w->head = NULL;
+	w->list = calloc(n, sizeof(signal));
+	if (w->list == NULL) {
+		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal list!\n");
+		exit(-1);
+	}
+
+	w->listLen = 0;
+	w->listMax = n;
 
 	w->symbolCount = '!';
 	w->tickCount = 0;
@@ -95,9 +104,14 @@ static vcdWriter* vcdCreateWriter(const char *fname)
 
 void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t width)
 {
+	if (w->listLen == w->listMax) {
+		fprintf(stderr, "VCDWriter Error: cant register signal %s. Limit reached!\n", name);
+		exit(-1);
+	}
+
 	signal *newSig = malloc(sizeof(*newSig));
 	if (newSig == NULL) {
-		fprintf(stderr, "VCDWriter Error: couldn't register space for signal %s!\n", name);
+		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal %s!\n", name);
 		exit(-1);
 	}
 
@@ -113,7 +127,7 @@ void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t wi
 	strncpy(newSig->name, name, NAMELEN);
 
 	// add to list
-	LL_APPEND(w->head, newSig);
+	w->list[w->listLen++] = newSig;
 }
 
 void vcdWriteHeader(vcdWriter *w)
@@ -127,8 +141,10 @@ void vcdWriteHeader(vcdWriter *w)
 	fprintf(w->fp, "$scope module top $end\n");
 
 	// iterate over registerd signals
-	LL_FOREACH(w->head, sig) {
-	  fprintf(w->fp, "$var wire %zu %c %s $end\n", sig->width, sig->symbol, sig->name);
+	for (int i = 0; i < w->listLen; ++i)
+	{
+		sig = w->list[i];
+		fprintf(w->fp, "$var wire %zu %c %s $end\n", sig->width, sig->symbol, sig->name);
 	}
 
 	fprintf(w->fp, "$upscope $end\n");
@@ -144,7 +160,9 @@ void vcdTick(vcdWriter *w)
 	fprintf(w->fp, "#%u\n", (w->tickCount)++);
 
 	// the list of signals
-	LL_FOREACH(w->head, sig) {
+	for (int i = 0; i < w->listLen; ++i)
+	{
+		sig = w->list[i];
 		val = pshdl_sim_getOutput(sig->idx);
 		if (val != sig->previous) {
 			fprintf(w->fp, "b%s %c\n", int2bin(val, sig->width), sig->symbol);

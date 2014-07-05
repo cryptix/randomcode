@@ -132,7 +132,7 @@ void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t wi
 
 void vcdWriteHeader(vcdWriter *w)
 {
-	signal *sig = w->list[0];
+	signal *sig;
 
 	// static header data
 	fprintf(w->fp, "$date %s $end\n", timeStamp());
@@ -141,8 +141,9 @@ void vcdWriteHeader(vcdWriter *w)
 	fprintf(w->fp, "$scope module top $end\n");
 
 	// iterate over registerd signals
-	for (int i = 0; i < w->listLen; sig = w->list[i++])
+	for (int i = 0; i < w->listLen; i++)
 	{
+		sig = w->list[i];
 		fprintf(w->fp, "$var wire %zu %c %s $end\n", sig->width, sig->symbol, sig->name);
 	}
 
@@ -151,8 +152,9 @@ void vcdWriteHeader(vcdWriter *w)
 
 	// print initial values
 	fprintf(w->fp, "#0\n");
-	for (int i = 0; i < w->listLen; sig = w->list[i++])
+	for (int i = 0; i < w->listLen; i++)
 	{
+		sig = w->list[i];
 		sig->now = pshdl_sim_getOutput(sig->idx);
 		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
@@ -160,7 +162,7 @@ void vcdWriteHeader(vcdWriter *w)
 
 void vcdTick(vcdWriter *w)
 {
-	signal *sig = w->list[0];
+	signal *sig;
 
 	// list of changed signals
 	signal *changed[w->listLen];
@@ -170,8 +172,9 @@ void vcdTick(vcdWriter *w)
 	w->tickCount++;
 
 	// get new values of all signals
-	for (int i = 0; i < w->listLen; sig = w->list[i++])
+	for (int i = 0; i < w->listLen; i++)
 	{
+		sig = w->list[i];
 		sig->now = pshdl_sim_getOutput(sig->idx);
 		if (sig->now != sig->last) {
 			sig->last = sig->now;
@@ -188,9 +191,9 @@ void vcdTick(vcdWriter *w)
 	fprintf(w->fp, "#%u\n", w->tickCount);
 
 	// output changed values
-	sig = changed[0];
-	for (int i = 0; i < changedCnt; sig = changed[i++])
+	for (int i = 0; i < changedCnt; i++)
 	{
+		sig = changed[i];
 		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
 

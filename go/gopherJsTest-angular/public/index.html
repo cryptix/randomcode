@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en" ng-app="gopherJsApp">
+<head>
+  <!-- <meta charset="utf-8"> -->
+  <title>My HTML File</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.11/angular.min.js"></script>
+  <script src="js/controllers.js"></script>
+</head>
+<body ng-controller="PhoneListCtrl">
+
+  <ul>
+    <li ng-repeat="phone in phones">
+      {{phone.Name}}
+      <p>{{phone.Snippet}}</p>
+    </li>
+  </ul>
+
+</body>
+</html>

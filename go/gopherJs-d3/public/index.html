@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>My HTML File</title>
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <script src="d3.min.js"></script>
+  <!-- <script src="http://127.0.0.1:3000/_d/js"></script> -->
+  <script src="/tut.js"></script>
+  <script>
+  function mkPlot (data) {
+  	BarChartTut.part1("#chart1",data);
+    BarChartTut.part2("#chart2",data);
+    BarChartTut.part3("#chart3","data.tsv");
+    BarChartTut.part4("#chart4");
+  }
+
+  function updatePlot() {
+    var data = eval(prompt("new data:","[4, 8, 15, 17, 23, 42]"));
+    mkPlot(data);
+  }
+  </script>
+</head>
+<body onload="mkPlot([4, 8, 15, 17, 23, 42]);">
+<div class="container">
+  <div class="row">
+    <div class="page-header">
+  	 <h1>D3 Tutorial <small>Written in Go using <a href="https://github.com/iansmith/d3">gopherJS wrapped D3</a></small> <button class="btn" onclick="updatePlot();">Update Plots</button></h1>
+    </div>
+
+    <h3>Part 1 <small>a simple html chart</small></h3>
+  	<div id="chart1"></div>
+
+
+  	<h3>Part 2 <small>based on with SVG</small></h3>
+  	<svg id="chart2"></svg>
+
+    <h3>Part 3 <small>load some .tsv</small></h3>
+    <svg id="chart3"></svg>
+
+    <h3>Part 4 <small>roating and axis</small></h3>
+    <svg id="chart4"></svg>
+  </div>
+
+</div>
+</body>
+</html>

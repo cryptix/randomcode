@@ -7,6 +7,7 @@ inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
 
 #include <stdio.h>
 #include <string.h>
+#include <zlib.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
@@ -78,12 +79,20 @@ static vcdWriter* vcdCreateWriter(const char *fname)
 		exit(-1);
 	}
 
+	gzFile *zfp;
+
 	// open file
-	if ((w->fp = fopen(fname, "w")) == NULL)
+	if ((zfp = gzopen(fname, "w")) == NULL)
 	{
 		fprintf(stderr, "VCDWriter Error: Can't open output file %s!\n", fname);
 		exit(-2);
 	}
+
+	w->fp = funopen(zfp,
+                 (int(*)(void*,char*,int))gzread,
+                 (int(*)(void*,const char*,int))gzwrite,
+                 (fpos_t(*)(void*,fpos_t,int))gzseek,
+                 (int(*)(void*))gzclose);
 
 	// init list
 	w->list = calloc(MAXSIGNALS, sizeof(signal));

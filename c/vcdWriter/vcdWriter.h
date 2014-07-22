@@ -31,6 +31,7 @@ typedef struct signal {
 
 // vcdWriter
 typedef struct vcdWriter {
+	gzFile *zfp;
 	FILE *fp; 			// file to write to
 
 	int symbolCount; 	// number of signals tracked
@@ -79,16 +80,15 @@ static vcdWriter* vcdCreateWriter(const char *fname)
 		exit(-1);
 	}
 
-	gzFile *zfp;
 
 	// open file
-	if ((zfp = gzopen(fname, "w")) == NULL)
+	if ((w->zfp = gzopen(fname, "w")) == NULL)
 	{
 		fprintf(stderr, "VCDWriter Error: Can't open output file %s!\n", fname);
 		exit(-2);
 	}
 
-	w->fp = funopen(zfp,
+	w->fp = funopen(w->zfp,
                  (int(*)(void*,char*,int))gzread,
                  (int(*)(void*,const char*,int))gzwrite,
                  (fpos_t(*)(void*,fpos_t,int))gzseek,
@@ -206,12 +206,18 @@ void vcdTick(vcdWriter *w)
 		fprintf(w->fp, "b%s %c\n", int2bin(sig->now, sig->width), sig->symbol);
 	}
 
+	if (w->tickCount%1000 == 0)
+	{
+		 gzflush(w->zfp, Z_SYNC_FLUSH);
+	}
+
 }
 
 
 void vcdCloseWriter(vcdWriter *w)
 {
 	fflush(w->fp);
+	gzflush(w->zfp, Z_FINISH);
 	fclose(w->fp);
 }
 

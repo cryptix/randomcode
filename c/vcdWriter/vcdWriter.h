@@ -20,14 +20,14 @@ inspired by pig2vcd http://abyz.co.uk/rpi/pigpio/pig2vcd.html
 // =================
 // type declarations
 
-// signal represents a simualted signal
-typedef struct signal {
+// simSig represents a simualted signal
+typedef struct simSig {
     int idx;			// simulation index
     char symbol;		// char used inside vcd file
     char name[NAMELEN]; // name of the signal
     size_t width;		// amount of bits for this signal
     uint64_t now, last; // current and previous values
-} signal;
+} simSig;
 
 // vcdWriter
 typedef struct vcdWriter {
@@ -37,7 +37,7 @@ typedef struct vcdWriter {
 	int symbolCount; 	// number of signals tracked
 	uint32_t tickCount; // tick counter
 
-	signal **list;		// list of signals to track
+	simSig **list;		// list of signals to track
 	size_t listLen;		// current number of signals
 } vcdWriter;
 
@@ -95,7 +95,7 @@ static vcdWriter* vcdCreateWriter(const char *fname)
                  (int(*)(void*))gzclose);
 
 	// init list
-	w->list = calloc(MAXSIGNALS, sizeof(signal));
+	w->list = calloc(MAXSIGNALS, sizeof(simSig));
 	if (w->list == NULL) {
 		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal list!\n");
 		exit(-1);
@@ -118,7 +118,7 @@ void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t wi
 	}
 
 	// allocate new signal
-	signal *newSig = malloc(sizeof(*newSig));
+	simSig *newSig = malloc(sizeof(*newSig));
 	if (newSig == NULL) {
 		fprintf(stderr, "VCDWriter Error: couldn't allocate space for signal %s!\n", name);
 		exit(-1);
@@ -141,7 +141,7 @@ void vcdRegisterSignal(vcdWriter *w, const int idx,  const char* name, size_t wi
 
 void vcdWriteHeader(vcdWriter *w)
 {
-	signal *sig;
+	simSig *sig;
 
 	// static header data
 	fprintf(w->fp, "$date %s $end\n", timeStamp());
@@ -171,10 +171,10 @@ void vcdWriteHeader(vcdWriter *w)
 
 void vcdTick(vcdWriter *w)
 {
-	signal *sig;
+	simSig *sig;
 
 	// list of changed signals
-	signal *changed[w->listLen];
+	simSig *changed[w->listLen];
 	size_t changedCnt=0;
 
 	// increase timestamp counter

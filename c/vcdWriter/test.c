@@ -15,7 +15,7 @@ uint64_t pshdl_sim_getOutput(int idx, ...)
 
 int main(int argc, char const *argv[])
 {
-	vcdWriter *w = vcdCreateWriter("test.vcd",4);
+	vcdWriter *w = vcdCreateWriter("test.vcd.gz");
 
 
 

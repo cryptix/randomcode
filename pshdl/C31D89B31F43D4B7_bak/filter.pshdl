@@ -1,0 +1,33 @@
+module de.tuhh.ict.Filter {
+ 	@clock in bit clk;
+ 	@reset in bit rst;
+
+	//Wenn newSuperSample 1 ist, ist gerade ein neues Sample reingekommen.
+	//die Samples kommen mit einer Rate von 48Khz rein
+	//in bit newSuperSample;
+	//Wenn T1 auf 0 geht wird die Taste gedrückt
+	in bit T1;
+	in int<26> leftSample, rightSample;
+	//Die Audio Ausgänge
+	out int<26> leftSampleOut, rightSampleOut;
+	
+
+	de.tuhh.hbubert.simpleFir leftFilter;
+	de.tuhh.hbubert.simpleFir rightFilter;
+
+	leftFilter.clk = clk;
+	leftFilter.rst = rst;
+	rightFilter.clk = clk;
+	rightFilter.rst = rst;
+
+	leftFilter.x = leftSample;
+	rightFilter.x = rightSample;
+
+	if (T1==0) {
+		leftSampleOut=leftFilter.y;
+		rightSampleOut=rightFilter.y;
+	} else {
+		leftSampleOut=leftSample;
+		rightSampleOut=rightSample;
+	}
+}

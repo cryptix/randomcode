@@ -5,9 +5,10 @@
 # Isos
 ##
 
-# /mnt/play/Downloads/mu_visual_studio_2010_sp1_x86_dvd_651704.iso
-# /mnt/play/virtio-win-0.1-74.iso
-# /mnt/play/isos/kali-linux-1.0.6-amd64/kali-linux-1.0.6-amd64.iso
+# /home/cryptix/play/Downloads/mu_visual_studio_2010_sp1_x86_dvd_651704.iso
+# /home/cryptix/play/isos/virtio-win-0.1-74.iso
+# /home/cryptix/play/isos/kali-linux-1.0.6-amd64/kali-linux-1.0.6-amd64.iso
+# /home/cryptix/play/isos/FreeBSD-10.1-RELEASE-amd64-memstick.img
 
 is32bit=0
 
@@ -21,8 +22,9 @@ cat << EOF
 6) Linux - kali
 7) Linux - Arch 32bit
 8) Linux - Arch 64bit
-9) FreeBSD 10
-10) OpenBSD
+9) Linux - sabotage
+10) BSD  - FreeBSD 10.1
+11) Win10 - Preview
 EOF
 
 read vmSel
@@ -31,8 +33,11 @@ read vmSel
 ram=$((4*1024))
 rootDrive=/dev/null
 extraArgs=""
-netConfig="-net nic,model=virtio -net bridge,br=br0"
-spicePort=$(( 5930 + $(pgrep spicec | wc -l) ))
+cnt=$(pgrep qemu-system | wc -l)
+spicePort=$(( 5930 + $cnt ))
+switchPort=$(( 2 + $cnt ))
+netConfig="-net nic,model=virtio,macaddr=52:54:00:de:ad:0$((2*switchPort)),vlan=0 -net vde,sock=/tmp/qemuNet.ctl,vlan=0,port=$switchPort"
+#netConfig="-net nic,model=virtio -net bridge,br=br0"
 
 case $vmSel in
 	1)
@@ -48,8 +53,8 @@ case $vmSel in
 
 	3)
 		rootDrive=/dev/zvol/zdata/Win7
-		extraArgs="-usb -device usb-host,vendorid=0x4b9,productid=0x300"
-		extraMedia="-drive file=/mnt/play/isos/virtio-win-0.1-74.iso,media=cdrom"
+		#extraArgs="-usb -device usb-host,vendorid=0x4b9,productid=0x300"
+		#extraMedia="-drive file=/mnt/play/isos/virtio-win-0.1-74.iso,media=cdrom"
 		;;
 
 	4)
@@ -76,12 +81,18 @@ case $vmSel in
 		;;
 
 	9)
-		rootDrive=/dev/zvol/zdata/FreeBSD10
+		rootDrive=/dev/zvol/zdata/LinuxSabotage
 		;;
 
 	10)
-		rootDrive=/dev/zvol/zdata/openBSD
-		extraMedia="-drive file=/mnt/play/isos/openBSD.5.5.iso,media=cdrom"
+		rootDrive=/dev/zvol/zdata/FreeBSD10.1
+		#extraMedia="-drive file=/home/cryptix/play/isos/FreeBSD-10.1-RELEASE-amd64-bootonly.iso,media=cdrom -boot d"
+		;;
+
+	11)
+		rootDrive=/dev/zvol/zdata/Win10Preview
+		#extraMedia="-drive file=/home/cryptix/play/isos/Windows10_TechnicalPreview_x64_EN-GB_9926.iso,media=cdrom -boot d"
+		extraArgs="-drive file=/home/cryptix/play/isos/virtio-win-0.1-74.iso,media=cdrom"
 		;;
 esac
 
@@ -108,4 +119,4 @@ $guestArch \
 	-device virtserialport,chardev=spicechannel0,name=com.redhat.spice.0 \
 	-chardev spicevmc,id=spicechannel0,name=vdagent \
 	$extraArgs &
- spicec -h localhost -p $spicePort
+spicec -h localhost -p $spicePort

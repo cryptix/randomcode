@@ -1,9 +1,10 @@
 package main
 
 import (
-	"code.google.com/p/go.net/websocket"
 	"fmt"
 	"net/http"
+
+	"code.google.com/p/go.net/websocket"
 )
 
 func main() {

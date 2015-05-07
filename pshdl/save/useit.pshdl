@@ -1,0 +1,14 @@
+package de.tuhh.hbubert.mundms;
+module useIt {
+	@clock in bit CLK_66MHZ;
+  @reset in bit USER_RESET;
+
+  PWM p;
+  Counter c;
+
+  out bit<4> LED;
+
+  p.value = c.cout;
+
+  LED{0} = p.pwmOut;
+}

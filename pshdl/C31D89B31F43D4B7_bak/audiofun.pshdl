@@ -1,0 +1,61 @@
+module de.tuhh.ict.AudioCodecSCLBased {
+	@clock in bit sclk; //declare as default clock
+	@reset in bit rst;
+
+	//clock for each new sample / channel switch
+	in bit lrck;
+	register bit lrck_prev=lrck;
+	
+	register int<24> sample_out;
+	register bit<24> shift_sample_out, shift_sample_in;
+	//Input sample logic
+	in bit sdout;
+	shift_sample_in=shift_sample_in{22:0}#sdout;
+	//Output sample logic
+	out bit sdin=shift_sample_out{23};
+	if (doShift)
+		shift_sample_out<<=1; 
+
+	enum States = { waitLREdge, startSampling, sampleCount };
+	register enum States state;
+	bit nextSample=0;
+	bit doShift=0;
+	register uint<5> counter=counter+1;
+	switch (state) {
+		case waitLREdge:
+			if (lrck_prev!=lrck){			
+				state=startSampling;
+			}
+		case startSampling:
+			counter=0;
+			state=sampleCount;
+			doShift=1;
+		case sampleCount:
+			doShift=1;
+			if (counter==24){
+				doShift=0;
+				nextSample=1;
+				state=waitLREdge;
+			}
+		default:
+	}
+	register uint<3> sampleCounter;
+	register int<26> superSample[8];
+	out register int<26> leftSample, rightSample;
+	out register bit newSuperSample=0;
+	in int<24> leftSampleOut, rightSampleOut;
+	if (nextSample){
+			shift_sample_out=sample_out;
+			sampleCounter+=1;
+			superSample[sampleCounter]=(int<26>)((int<24>)shift_sample_in); //Need to cast it to signed first, then resize
+			if (sampleCounter==0){
+				leftSample=(superSample[0]+superSample[2]+superSample[4]+superSample[6]);
+				rightSample=(superSample[1]+superSample[3]+superSample[5]+superSample[7]);
+				newSuperSample=1;
+			}
+	}
+	if (sampleCounter{0})
+		sample_out=leftSampleOut;
+	else
+		sample_out=rightSampleOut;
+}

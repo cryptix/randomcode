@@ -28,7 +28,6 @@ func main() {
 
 		fmt.Fprintf(writeMe, "firfoo%d\"", rand.Int())
 		writeMe.Close()
-
 	}
 
 	cmd := exec.Command("c/a.out", strconv.Itoa(i))

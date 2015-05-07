@@ -1,0 +1,29 @@
+package de.tuhh.hbubert;
+module codecTest {
+	@clock in bit CLK_66MHZ;
+  @reset in bit USER_RESET;
+
+  // audio codec pins
+  out bit sdin;
+  in bit lrck;
+	in bit sclk;
+
+	//Any activity on SDA/SCL will prevent the 
+	//stand-alone mode from happening	
+	inout bit SDA=highZ(),SCL=highZ();
+
+  sdin = codec.sdin;
+  codec.lrck = lrck;
+	codec.sclk = sclk;
+
+	AudioCodecSCLBased codec;
+	SineROM srom;
+
+	register uint<27> counter=counter+1;
+
+	srom.addr = counter{26:17};
+
+
+	codec.leftSampleOut = srom.sinOut;
+	codec.rightSampleOut = srom.sinOut;
+}

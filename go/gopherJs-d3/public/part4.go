@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/iansmith/d3"
 	"honnef.co/go/js/console"
-	"strconv"
 )
 
 type margin struct {

@@ -1,0 +1,79 @@
+module de.tuhh.ict.piezo {
+	
+	include Bus tone=generate plb()<[
+		row note{
+			fill;
+			rw register uint<6> quadDuration;
+			rw register uint<21> invFreq;
+		}
+		row control {
+			fill;
+			rw register uint<5> noteCounter;
+			rw register bit enable;
+		}
+		row beatSpeed {
+			fill;
+			rw register uint<26> beatCompare limit;
+		}
+		row beatShutdown {
+			fill;
+			rw register uint<26> beatPreShutdown limit;
+		}
+		column music {
+			note[32];
+			control;
+			beatSpeed;
+			beatShutdown;
+		}
+		memory {
+			music;
+		}
+	]>; 	
+
+	register uint<26> 	beatCounter=beatCounter+1;
+	register uint <6> 	durationCounter;
+	register bit				outputEnable;
+	register uint<32>		clkGenCounter;
+	register uint<32>		clkGenCounterTop;
+	register bit				clkGen;
+	
+	if (!tone.enable) {
+		beatCounter=0;
+		outputEnable=0;
+	} else {
+		if (beatCounter>tone.beatPreShutdown && durationCounter==0){
+			outputEnable=0;
+		}
+		if (beatCounter>=tone.beatCompare){
+			beatCounter=0;
+			if (durationCounter==0){
+				if (tone.invFreq[tone.noteCounter]!=0){
+					clkGenCounterTop=tone.invFreq[tone.noteCounter];
+					durationCounter=tone.quadDuration[tone.noteCounter];
+					tone.noteCounter+=1;
+				}
+				if (tone.invFreq[tone.noteCounter]>1)
+					outputEnable=1;
+				else
+					outputEnable=0;
+			} else {
+				durationCounter-=1;
+			}
+		}
+	}
+	if (!outputEnable){
+		clkGenCounter=0;
+		clkGen=0;
+	} else {
+		clkGenCounter+=1;
+		if (clkGenCounter>=clkGenCounterTop){
+			clkGenCounter=0;
+			clkGen=~clkGen;
+		}
+	}
+	out bit piezoOut;
+	if (outputEnable)
+		piezoOut=clkGen;
+	else
+		piezoOut=0;
+}

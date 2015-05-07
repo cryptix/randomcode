@@ -1,0 +1,33 @@
+module de.tuhh.ict.topMod {
+	//For some reason it is very important
+	//to put T2 to 'Z'
+	inout bit T1=highZ(),T2=highZ();
+
+	//Any activity on SDA/SCL will prevent the
+	//stand-alone mode from happening
+	inout bit SDA=highZ(),SCL=highZ();
+	out bit<4> LED;
+	/*LED{0}=*/
+	LED{1}=T1;
+	LED{2}=sclk;
+
+	// codec pass through ports
+	@clock in bit sclk; //declare as default clock
+	@reset in bit rst;
+	in bit lrck;
+	in bit sdout;
+	out bit sdin;
+
+
+	sdin = codec.sdin;
+	codec.sdout = sdout;
+	codec.sclk = sclk;
+	codec.rst = rst;
+	codec.lrck = lrck;
+
+	de.tuhh.ict.AudioCodecSCLBased codec;
+
+
+	codec.leftSampleOut=codec.leftSample;
+	codec.rightSampleOut=codec.rightSample;
+}

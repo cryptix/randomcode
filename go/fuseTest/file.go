@@ -83,6 +83,7 @@ func (fHandle File) Write(req *fuse.WriteRequest, resp *fuse.WriteResponse, intr
 	log.Printf("Req: %#v\n", req)
 	log.Println("Offset:", req.Offset)
 	log.Println("Data:", string(req.Data))
+	log.Printf("Flags: %x\n", req.Flags)
 
 	f, ok := files[fHandle.name]
 	if !ok {

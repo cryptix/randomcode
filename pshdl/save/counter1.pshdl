@@ -1,0 +1,11 @@
+package de.tuhh.hbubert.mundms;
+module Counter {
+	@clock in bit CLK_66MHZ;
+  @reset in bit USER_RESET;
+  out uint<8> cout;
+  
+  register uint<27> counter=counter+1;
+  
+
+  cout = counter{26:19};
+}

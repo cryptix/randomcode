@@ -1,0 +1,80 @@
+package de.tuhh.hbubert;
+interface VHDL.work.fifo_generator_v9_3_0 {
+	// codec side
+	out bit empty;
+	in bit rd_clk;
+	in bit rd_en;
+	out bit<24> dout;
+	// generator side
+	in bit rst;
+	in bit<24> din;
+	in bit wr_clk;
+	in bit wr_en;
+	out bit full;
+	out bit almost_full;
+}
+
+module buffedSinTest {
+	in bit CLK;
+
+	// audio codec pins
+	out bit sdin;
+	in bit sdout;
+	in bit lrck;
+	in bit sclk;
+	in bit rst;
+
+	//For some reason it is very important 
+	//to put T2 to 'Z'
+	inout bit T1=highZ(),T2=highZ();
+
+	//Any activity on SDA/SCL will prevent the 
+	//stand-alone mode from happening
+	inout bit SDA=highZ(),SCL=highZ();
+
+	out bit<4> LED;
+	LED{0} = sclk;
+	LED{1} = audiobuf.almost_full;
+	LED{2} = T1;
+	LED{3} = T2;
+	
+	// entities
+	AudioCodecSCLBased codec;
+	sinus sin;
+	VHDL.work.fifo_generator_v9_3_0 audiobuf;
+
+	// verdrahtung
+	sdin = codec.sdin;
+	codec.sdout = sdout;
+	codec.lrck = lrck;
+	codec.sclk = sclk;
+	codec.rst = T1;
+	
+	audiobuf.rst = T1;
+
+	
+	// codec side
+	audiobuf.rd_clk = sclk;
+	audiobuf.rd_en = 1;
+	codec.leftSampleOut = (int<24>) audiobuf.dout;
+	codec.rightSampleOut = (int<24>) audiobuf.dout;
+
+
+	// generator side
+	sin.clk = CLK;
+	sin.rst = T1;
+
+	sin.freq = 440;
+
+	audiobuf.wr_clk = CLK;
+	audiobuf.din = sin.dout;
+
+	// stop generating if buffer almost full
+	if (audiobuf.almost_full == 1) {
+		sin.enable = 0;
+		audiobuf.wr_en = 0;	
+	} else {
+		sin.enable =  1;
+		audiobuf.wr_en = 1;
+	}
+}

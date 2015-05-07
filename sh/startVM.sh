@@ -22,7 +22,7 @@ cat << EOF
 6) Linux - kali
 7) Linux - Arch 32bit
 8) Linux - Arch 64bit
-9) Linux - sabotage
+9) Linux - SVA Android
 10) BSD  - FreeBSD 10.1
 11) Win10 - Preview
 EOF
@@ -81,7 +81,8 @@ case $vmSel in
 		;;
 
 	9)
-		rootDrive=/dev/zvol/zdata/LinuxSabotage
+		rootDrive=/dev/zvol/zdata/LinuxAndroidSVA
+		#extraMedia="-drive file=/home/cryptix/play/isos/archlinux-2015.05.01-dual.iso,media=cdrom -boot d"
 		;;
 
 	10)

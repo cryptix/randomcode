@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="version" content="1.0.2">
+    <meta name="version" content="1.0.1">
     <title>Spectromadness</title>
-    <script type="text/javascript" src="jquery-1.8.0.min.js"></script>
-    <script type="text/javascript" src="chroma.js"></script>
+    <script type="text/javascript" src="https://ipfs.io/ipfs/QmQG9qWyRPgqwhtfsvnp4h3DrDDNxTTojk8rqe1KjTVGAn/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="https://ipfs.io/ipfs/QmQG9qWyRPgqwhtfsvnp4h3DrDDNxTTojk8rqe1KjTVGAn/chroma.js"></script>
+    <link rel="version" href="06cacdfa7d257a57349691041f8a664515744928b57513317589d5b19ea9c3bbd20479e9596003f71879bbeec86eba5aaaace6372e4f34f798199b735abbf66a.html" version="1.0.0">
+    <link rel="predecessor-version" href="06cacdfa7d257a57349691041f8a664515744928b57513317589d5b19ea9c3bbd20479e9596003f71879bbeec86eba5aaaace6372e4f34f798199b735abbf66a.html">
   </head>
   <body>
 <h2>Graph will start animating when music is loaded</h2>
 
-<p> For more information on how this is done look at <a
-        href="http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound">this article.</a>.
+<p> For more information on how this is done look at <a href="http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound">this article.</a>.
 </p>
 
 <canvas id="canvas" width="800" height="512" style="display: block; background-color: black ;"></canvas>
@@ -46,12 +47,12 @@
         colors:['#000000', '#ff0000', '#ffff00', '#ffffff'],
         positions:[0, .25, .75, 1],
         mode:'rgb',
-        limits:[0, 500]
+        limits:[0, 300]
     });
 
     // load the sound
     setupAudioNodes();
-    loadSound("track.mp3");
+    loadSound("https://ipfs.io/ipfs/QmQG9qWyRPgqwhtfsvnp4h3DrDDNxTTojk8rqe1KjTVGAn/wagner-short.ogg");
 
 
     function setupAudioNodes() {
@@ -65,7 +66,7 @@
         // setup a analyzer
         analyser = context.createAnalyser();
         analyser.smoothingTimeConstant = 0;
-        analyser.fftSize = 2048;
+        analyser.fftSize = 1024;
 
         // create a buffer source node
         sourceNode = context.createBufferSource();

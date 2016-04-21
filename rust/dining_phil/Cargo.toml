@@ -1,0 +1,6 @@
+[package]
+name = "dining_phil"
+version = "0.1.0"
+authors = ["Henry <cryptix@riseup.net>"]
+
+[dependencies]

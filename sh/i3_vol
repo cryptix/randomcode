@@ -1,0 +1,15 @@
+#!/bin/mksh
+
+case $1 in
+	"up")
+		amixer -c 0 sset 'Master',0 2dB+
+		;;
+	"down")
+		amixer -c 0 sset 'Master',0 2dB-
+		;;
+	"toggle")
+		amixer set Master toggle
+		;;
+	*)
+		echo "Usage: %1 <up|down>"
+esac

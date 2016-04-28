@@ -1,0 +1,16 @@
+#! /bin/bash
+
+dev="SynPS/2 Synaptics TouchPad"
+
+xinput list "$dev" | grep "This device is disabled"
+
+case "$?" in
+	"0")
+					echo "was off, turning on"
+					xinput enable "$dev"
+					;;
+	*)
+					echo "was on, turning off"
+					xinput disable "$dev"
+					;;
+esac

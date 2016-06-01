@@ -15,7 +15,7 @@ int main() {
 
     strncpy(buf,"Hello, World\n",HWLEN);
 
-    printf(buf);
+    printf("%s",buf);
 
     free(buf);
     return 0;

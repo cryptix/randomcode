@@ -1,0 +1,23 @@
+package de.tuhh.hbubert.mundms;
+module useIt {
+	@clock in bit CLK_66MHZ;
+  @reset in bit USER_RESET;
+  out bit<4> LED;
+
+  PWM p;
+  Counter c;
+
+  p.CLK_66MHZ = $clk;
+  p.USER_RESET = $rst;
+
+	c.CLK_66MHZ = $clk;
+  c.USER_RESET = $rst;
+
+  p.value = c.cout;
+  //p.value = 128;
+
+  LED{0} = p.pwmOut;
+  LED{1} = 1;
+  LED{2} = c.cout{6};
+  LED{3} = c.cout{5};
+}

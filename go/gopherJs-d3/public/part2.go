@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/iansmith/d3"
 )

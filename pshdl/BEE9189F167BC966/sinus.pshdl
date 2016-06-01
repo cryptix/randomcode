@@ -1,0 +1,24 @@
+package de.tuhh.hbubert;
+module sinus {
+	// external ports
+	@clock in bit clk;
+	@reset in bit rst;
+
+	in bit enable;
+
+	in int<18> freq;
+	out int<24> dout;
+
+	// internal
+	de.tuhh.hbubert.ddfs ddfs;
+
+
+	ddfs.enable = enable;
+	ddfs.clk = clk;
+	ddfs.rst = rst;
+
+	ddfs.freq = freq;
+
+	//dout = (8388608 + ddfs.dout)/2;
+	dout = ddfs.dout;
+}

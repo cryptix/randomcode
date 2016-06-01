@@ -1,5 +1,4 @@
 #!/bin/sh
-#netbook version
 
 while true;
 do

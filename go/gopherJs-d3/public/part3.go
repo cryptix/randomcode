@@ -1,10 +1,11 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/iansmith/d3"
 	"honnef.co/go/js/console"
-	"strconv"
 )
 
 func part3(id d3.Selector, data js.Object) {

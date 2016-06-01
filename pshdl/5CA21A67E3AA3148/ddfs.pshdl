@@ -1,0 +1,43 @@
+package de.tuhh.hbubert;
+module ddfs {
+	// external ports
+	@clock in bit clk;
+	@reset in bit rst;
+	in bit<18> freq;
+	out bit<24> dout;
+
+	// internal signals
+	register uint<30> Akkum;
+	register uint<6> RomAddr;
+	
+	register bit Sign;
+	bit Quadrant;
+	
+	int<24> Result;
+
+	const int<24> SinusRom[64] = {0x0, 0x3242a, 0x647d9, 0x96a90, 0xc8bd3, 0xfab27, 0x12c810, 0x15e214, 0x18f8b8, 0x1c0b82, 0x1f19f9, 0x2223a4, 0x25280c, 0x2826b9, 0x2b1f34, 0x2e110a, 0x30fbc5, 0x33def2, 0x36ba20, 0x398cdd, 0x3c56ba, 0x3f1749, 0x41ce1e, 0x447acd, 0x471cec, 0x49b415, 0x4c3fdf, 0x4ebfe8, 0x5133cc, 0x539b2a, 0x55f5a4, 0x5842dd, 0x5a8279, 0x5cb420, 0x5ed77c, 0x60ec38, 0x62f201, 0x64e889, 0x66cf81, 0x68a69e, 0x6a6d98, 0x6c2429, 0x6dca0d, 0x6f5f02, 0x70e2cb, 0x72552c, 0x73b5eb, 0x7504d3, 0x7641af, 0x776c4e, 0x788484, 0x798a23, 0x7a7d05, 0x7b5d03, 0x7c29fb, 0x7ce3ce, 0x7d8a5f, 0x7e1d93, 0x7e9d55, 0x7f0991, 0x7f6236, 0x7fa736, 0x7fd887, 0x7ff621 };
+
+	in bit enable;
+	// Phasenakkumulator
+	if (enable == 1) {
+		Akkum += (uint<18>)freq;
+	}
+	Result = SinusRom[RomAddr];
+
+	Quadrant = Akkum{28};
+	Sign = Akkum{29};
+
+
+	if (Quadrant == 0) {
+		RomAddr = Akkum{27:22};
+	} else {
+		RomAddr = (63 - Akkum{27:22});
+	}
+
+	if (Sign == 0) {
+		dout = Result;
+	} else {
+		dout = 0-Result;
+	}
+
+}

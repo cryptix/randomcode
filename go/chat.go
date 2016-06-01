@@ -24,6 +24,7 @@ func match(c io.ReadWriteCloser) {
 func chat(a, b io.ReadWriteCloser) {
 	fmt.Fprintln(a, "Found one! Say Hi!")
 	fmt.Fprintln(b, "Found one! Say Hi!")
+
 	errc := make(chan error, 1)
 	go myCopy(a, b, errc)
 	go myCopy(b, a, errc)

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 term=urxvtc
 
@@ -15,17 +15,19 @@ fi
 	fi
 )
 
-choice=`awk -F'"' '/"\)/{print $2}' /usr/local/bin/terMenu.sh | dmenu -p 'start:'`
+choice=`awk -F'"' '/"\)/{print $2}' /usr/local/bin/terMenu.sh | dmenu -p 'terMenu:'`
 case $choice  in
+  "gocd")
+    cd $(gopkgdir.sh) && exec $term
+  ;;
+
   "open")
-    pids=$(pgrep zsh)
-    cd $(ls -ld /proc/*/cwd | awk "/${pids//$'\n'/|}/{print \$NF}" | sort -u | dmenu -p 'open:') && exec $term
+    cd `lsof -d cwd -Fn | grep '^n' | cut -dn -f2- | cut -d ' ' -f 1 | sort -u | dmenu -p 'open:'` && exec $term
   ;;
 
   "ssh")
     host=`awk '/^Host/{print $2}' ~/.ssh/config | dmenu -p 'ssh:'` && exec $term -e ssh $host
   ;;
-
 
   "root")
     exec $term -e su -

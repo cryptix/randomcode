@@ -1,0 +1,20 @@
+package de.tuhh.hbubert.mundms;
+module PWM {
+	in uint<8> value;
+
+	@clock in bit CLK_66MHZ;
+  @reset in bit USER_RESET;
+
+  register uint<8> step;
+
+  out bit pwmOut;
+
+  step = step + 1;
+
+
+  if (step < value) {
+    pwmOut = 1;
+  } else {
+    pwmOut = 0;
+  }
+}

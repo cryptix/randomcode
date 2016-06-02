@@ -1,7 +1,7 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
-#export GOPATH=$HOME/Work/DST-Code/TIS-Go:$HOME/Work/DST-Code/TIS-Go/vendor
-#export GOPATH=$HOME/go
+#export GOPATH=$HOME/DST/TIS-Go:$HOME/DST/TIS-Go/vendor
+export GOPATH=$HOME/go
 
 pkg=$(go list all | dmenu -p 'go pkg:' -l 10 -i)
 gopathEnts=(${GOPATH//:/ })

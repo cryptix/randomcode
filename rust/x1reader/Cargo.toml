@@ -1,0 +1,8 @@
+[package]
+name = "x1reader"
+version = "0.1.0"
+authors = ["Henry <cryptix@riseup.net>"]
+
+[dependencies]
+evdev = { git = "https://github.com/cryptix/evdev.git" }
+
